@@ -1,0 +1,56 @@
+{
+  "name": "petApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "lint": "eslint .",
+    "start": "react-native start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fontsource/roboto": "^5.0.12",
+    "@mui/material": "^5.15.15",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
+    "@react-native-community/checkbox": "^0.5.17",
+    "@react-native-community/masked-view": "^0.1.11",
+    "@react-native-firebase/analytics": "^19.1.2",
+    "@react-native-firebase/app": "^19.1.2",
+    "@react-navigation/bottom-tabs": "^6.5.20",
+    "@react-navigation/native": "^6.1.17",
+    "@react-navigation/native-stack": "^6.9.26",
+    "expo": "^50.0.0",
+    "react": "18.2.0",
+    "react-native": "0.73.5",
+    "react-native-elements": "^3.4.3",
+    "react-native-gesture-handler": "^2.16.1",
+    "react-native-reanimated": "^3.10.0",
+    "react-native-safe-area-context": "^4.10.1",
+    "react-native-screens": "^3.31.1",
+    "react-native-vector-icons": "^10.0.3",
+    "styled-components": "^6.1.8"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/babel-preset": "0.73.21",
+    "@react-native/eslint-config": "0.73.2",
+    "@react-native/metro-config": "0.73.5",
+    "@react-native/typescript-config": "0.73.1",
+    "@types/react": "^18.2.6",
+    "@types/react-test-renderer": "^18.0.0",
+    "babel-jest": "^29.6.3",
+    "eslint": "^8.19.0",
+    "jest": "^29.6.3",
+    "prettier": "2.8.8",
+    "react-test-renderer": "18.2.0",
+    "typescript": "5.0.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

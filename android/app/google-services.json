@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1025916712151",
+    "project_id": "petstop-c4ad9",
+    "storage_bucket": "petstop-c4ad9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1025916712151:android:0751eea7267ff8d6b4ac92",
+        "android_client_info": {
+          "package_name": "com.kelompok4.petstop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhKYY0ZxnG7cTjQHHgHVFCi9Kl0tpXSTY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
