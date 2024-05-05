@@ -29,7 +29,8 @@ const HomeStack = () => {
 
 const Index = () => {
   return (
-    <Tab.Navigator initialRouteName="Home">
+    <Tab.Navigator
+    screenOptions={{tabBarStyle:{height: 60}}}>
       <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
       <Tab.Screen name="History" component={HistoryPage} options={{ headerShown: false }} />
       <Tab.Screen name="Notification" component={NotificationPage} options={{ headerShown: false }} />

@@ -5,7 +5,6 @@ import {
   TextInput,
   Text, 
   StyleSheet,
-  Alert,
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
@@ -20,7 +19,7 @@ const LoginPage = ({navigation}: any) => {
   const handleLoginButtonPress = () =>{
     // console.log("Login Button Clicked");
     // Alert.alert("Button Clicked", "You Clicked the Button");
-    navigation.navigate("Home");
+    navigation.navigate("Index");
   };
 
   const handleRegisterButtonPress = () => {

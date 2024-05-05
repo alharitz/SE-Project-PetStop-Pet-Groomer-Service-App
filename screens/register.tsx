@@ -41,7 +41,7 @@ const RegisterPage =  ({navigation} : any) => {
   // handle submit  
   const [isSelected, setSelection] = useState(false);
   const handleSubmit = () =>{
-    navigation.navigate("Index");
+    navigation.navigate("Login");
   };
 
   return(
