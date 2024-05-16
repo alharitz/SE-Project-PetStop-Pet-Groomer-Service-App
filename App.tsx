@@ -1,24 +1,56 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// import screen
 import Index from './screens/index';
 import LoginPage from './screens/login';
-import LoadingPage from './screens/loading';
+import LoadingPage from './screens/loading';    
 import RegisterPage from './screens/register';
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-  return (
-   <NavigationContainer>
-      <Stack.Navigator initialRouteName='Register'>
-        {/* Main Pages */}
-        {/* <Stack.Screen name='Loading' component={LoadingPage} options={{headerShown:false}}/> */}
-        <Stack.Screen name='Resgister' component={RegisterPage} options={{headerShown:false}}/>
-        <Stack.Screen name='Index' component={Index} options={{headerShown:false}}/>
-        <Stack.Screen name='Login' component={LoginPage} options={{headerShown:false}}/>
-      </Stack.Navigator>
+const App = () => {
+  // variables
+  const [isLoading, setLoading] = useState(true);
+  const [isLoggedIn, setLoggedIn] = useState(false);
 
-   </NavigationContainer>
+  useEffect(() => { // using useEffect so that the app can run many task at the same time
+    checkLoginStatus(); 
+  }, []);
+
+  // cheking login status using async storage that store data locally
+  const checkLoginStatus = async () => {
+    try {
+      // using email as an id
+      const UserId = await AsyncStorage.getItem('email');
+      if (UserId !== null) {
+        setLoggedIn(true);
+      }
+    } catch (error) {
+      console.log("Error Retrieving user token: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // while fetching the data, the app shows a loading screen
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  return (
+    <NavigationContainer>
+    {/* Cheking whether user data is stored (isLoggedIn) or not */}
+      <Stack.Navigator initialRouteName={isLoggedIn ? 'Index' : 'Login'}>
+        {/* Main Pages */}
+        <Stack.Screen name='Login' component={LoginPage} options={{ headerShown: false }} />
+        <Stack.Screen name='Register' component={RegisterPage} options={{ headerShown: false }} />
+        <Stack.Screen name='Index' component={Index} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
+
+export default App;

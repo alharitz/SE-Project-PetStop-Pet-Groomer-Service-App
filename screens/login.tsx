@@ -1,3 +1,9 @@
+// NOTES
+// 1. adding some respon when user typing
+// 2. making sure all the fields are filled
+// 3. adding hook to the backend
+// 4. adding token for asycn storage
+
 import React,{
   useState
 } from 'react';
@@ -11,14 +17,39 @@ import {
   KeyboardAvoidingView
 } from 'react-native';
 
+import { AsyncStorageHook } from '@react-native-async-storage/async-storage/lib/typescript/types';
+import  firestore  from '@react-native-firebase/firestore';
+
 import Icon from 'react-native-vector-icons/Feather';
 import CustomButton from '../assets/properties/CustomButton';
 
 const LoginPage = ({navigation}: any) => {
+  // Variables
+  // Email
+  const [email, onChangeEmail] = useState('');
+
+  // password
+  const [password, onChangePassword] = useState('');
+
+  // logged in
+  const [isLoggedIn, setLoggedIn] = useState(false);
+
+  // Check for email and password
+  const checkCredential = () =>{
+    firestore()
+    .collection('user')
+    .doc(email)
+    .get()
+  }
+
+
+  // make the token for async storage
+
 
   const handleLoginButtonPress = () =>{
-    // console.log("Login Button Clicked");
-    // Alert.alert("Button Clicked", "You Clicked the Button");
+    console.log("Login Button Clicked");
+  
+
     navigation.navigate("Index");
   };
 

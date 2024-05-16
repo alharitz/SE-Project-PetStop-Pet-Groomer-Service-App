@@ -1,3 +1,5 @@
+//  NOTES
+
 import React,{
     useState
   } from 'react';
@@ -10,22 +12,40 @@ import React,{
     SafeAreaView,
     TouchableOpacity,
     ScrollView,
-    KeyboardAvoidingView
-  } from 'react-native';
-
-  import CheckBox from '@react-native-community/checkbox';
+    KeyboardAvoidingView,
+  } from 'react-native';  
   
+  import CheckBox from '@react-native-community/checkbox';
+  import firestore from '@react-native-firebase/firestore';
+  
+  // Icon
   import Icon from 'react-native-vector-icons/Feather';
   import CustomButton from '../assets/properties/CustomButton';
 
+  // byrcrypt
+  const bycrypt = require('bcryptjs');
+
 const RegisterPage =  ({navigation} : any) => {
+  // VARIABLES
+  //email
+  const [email, onChangeEmail] = useState('');
 
-  // hidden and shown password
+  //name
+  const [firstName, onChangeFirstName] = useState('');
+  const [lastName, onChangeLastName] = useState('');
 
+// password
+  const [password, onChangePassword] = useState('');
+
+  // confirm password
+  const [confirmPassword, onChangePasswordConfirmPassword] = useState('');
+
+  //password show or hide
   const [showPassword, setShowPassword] = useState(false);
   const [iconName, setIconName] = useState('eye');
 
-  const  toggleShowPassword = ()=>{
+  // hidden and shown password
+  const toggleShowPassword = ()=>{
       setShowPassword(!showPassword);
       setIconName(iconName === 'eye' ? 'eye-off' : 'eye');
   };
@@ -36,13 +56,92 @@ const RegisterPage =  ({navigation} : any) => {
   const handlePhoneNumberChange = (text: any) => {
     const formattedPhoneNumber = text.replace(/[^0-9]/g, '');
     setPhoneNumber(formattedPhoneNumber);
-  };  
+  }; 
 
-  // handle submit  
+  // Checking all the fields are filled
+  const isFieldsFilled = () =>{
+    return firstName.trim() !== '' && 
+       lastName.trim() !== '' && 
+       email.trim() !== '' && 
+       password.trim() !== '' && 
+       confirmPassword.trim() !== '' && 
+       phoneNumber.trim() !== '' &&
+       isSelected;
+  }
+
+  // Terms and condition check
   const [isSelected, setSelection] = useState(false);
+
+  // Saving User data
+  const saveUserData = async() =>{
+    try {
+    // hasing password
+    let hashedPassword;
+    try {
+      const saltRounds = 10;
+      hashedPassword = await bycrypt.hash(password, saltRounds);
+    } catch (error) {
+      console.error("Couldn't hash password: ", error);
+    }
+      firestore()
+      .collection('user')
+      .doc(email)
+      .set({
+        email_address: email,
+        first_name: firstName,
+        last_name: lastName,
+        password: hashedPassword,
+        phone_number: phoneNumber
+      });
+    return;
+    } catch (error) {
+      console.error("Error saving user credential: ", error);
+    }
+  }
+
+  // check repeat password match
+  const checkRepeatPassowrd = () =>{
+    if(password != confirmPassword){
+      setErrorMessage("Confirm Password not match!.");
+      console.log("password error");
+    }else{
+      setErrorMessage('');
+      return;
+    }
+  }
+
+  // check email
+ async function checkDuplicateEmail() {
+    try {
+      const querySnapshot = await firestore()
+      .collection('user')
+      .doc(email)
+      .get();
+
+     return querySnapshot.exists;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+ }
+  
+  const [errorMessage, setErrorMessage] = useState('');
   const handleSubmit = () =>{
-    navigation.navigate("Login");
+    checkRepeatPassowrd();
+    checkDuplicateEmail().then(duplicateExist =>{
+      if(duplicateExist){
+       setErrorMessage("Email Already Exist, please use a different email.");
+       console.log("Email exist");
+      }else{
+        setErrorMessage('');
+        saveUserData()
+        // navigation.navigate("Login");
+      }
+    });
   };
+
+
+
 
   return(
     <KeyboardAvoidingView style={styles.page} behavior="padding">
@@ -54,20 +153,28 @@ const RegisterPage =  ({navigation} : any) => {
           <TextInput
             style={styles.form}
             placeholder='Firts Name'
+            onChangeText={onChangeFirstName}
+            value={firstName}
           />
           <TextInput
             style={styles.form}
             placeholder='Last Name'
+            onChangeText={onChangeLastName}
+            value={lastName}
           />
           <TextInput
             style={styles.form}
             placeholder='Email Address'
+            onChangeText={onChangeEmail}
+            value={email}
           />
           <SafeAreaView>
             <TextInput
               style={styles.form}
               placeholder='Choose Password'
               secureTextEntry = {!showPassword}
+              onChangeText={onChangePassword}
+              value={password}
             />
             <TouchableOpacity
               style={styles.eye_button}
@@ -81,6 +188,8 @@ const RegisterPage =  ({navigation} : any) => {
               style={styles.form}
               placeholder='Confirm Password'
               secureTextEntry = {!showPassword}
+              onChangeText={onChangePasswordConfirmPassword}
+              value={confirmPassword}
             />
             <TouchableOpacity
               style={styles.eye_button}
@@ -90,11 +199,11 @@ const RegisterPage =  ({navigation} : any) => {
             </TouchableOpacity>
           </SafeAreaView>
           <TextInput
-            value={phoneNumber}
             keyboardType='numeric'
             style={styles.form}
             placeholder='Phone Number'
             onChangeText={handlePhoneNumberChange}
+            value={phoneNumber}
           />
         </View>
         <View style={styles.check_box_container}>
@@ -111,6 +220,11 @@ const RegisterPage =  ({navigation} : any) => {
             tintColors={{ true: '#4630EB', false: undefined }}/>
         </View>
         <View>
+          {errorMessage !== '' && (
+            <Text style={{color: 'red'}}>
+              {errorMessage}
+            </Text>
+          )}
           <CustomButton
             title="Create Account"
             buttonStyle={{
@@ -124,7 +238,7 @@ const RegisterPage =  ({navigation} : any) => {
               fontSize: 22,
               fontWeight: '500',
             }}
-            disabled={!isSelected}
+            disabled={!isFieldsFilled()}
             onPress={handleSubmit}
           />
         </View>
