@@ -24,12 +24,10 @@ import  firestore  from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/Feather';
 import CustomButton from '../assets/properties/CustomButton';
 
-// bycrypt
-const bycrypt = require('bcryptjs');
-
+// BACK END
 const LoginPage = ({navigation}: any) => {
 // set error message
-const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Variables
   // Email
@@ -38,8 +36,11 @@ const [errorMessage, setErrorMessage] = useState('');
   // password
   const [password, onChangePassword] = useState('');
 
-  // logged in
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  // Checking all the fields are filled
+  const isFieldsFilled = () =>{
+    return email.trim() !== '' && 
+       password.trim() !== '';
+  }
 
   // handle login button
   const handleLoginButtonPress = async() =>{
@@ -54,38 +55,32 @@ const [errorMessage, setErrorMessage] = useState('');
       if(querySnapshot.exists){
         const userData = querySnapshot.data();
         if(userData){
-          // compare password
-          const passwordMatch = await bycrypt.compare(password, userData.password);
-
-          // checking if the password match
-          if(passwordMatch){
-            console.log(password)
-            await AsyncStorage.setItem('email',email); // saving login info
-            navigation.navigate('Index'); //navigate to home
+          if(password === userData.password){     // checking if the password match
+            await AsyncStorage.setItem('email',email);      // saving login info
+            setErrorMessage('');
+            navigation.navigate('Index');     //navigate to home
           }else{
             setErrorMessage("Incorrect password!");
+            return;
           }
-          console.log(userData.password)
-          setErrorMessage("Error comparing password!");
         }
-
-        // email not found
       }else{
-        setErrorMessage("Email not found, please register first!");
+        setErrorMessage("Email not found, please register first!");     // email not found
+        return;
       }
-      
-      // error handling
     } 
-    catch (error) {
+    catch (error) {     // error handling
       console.error("Error fetching data:", error);
       throw error;
     }
   };
 
+  // handle register password
   const handleRegisterButtonPress = () => {
      navigation.navigate("Register");
   };
 
+  // show or hide password
   const [showPassword, setShowPassword] = useState(false);
   const [iconName, setIconName] = useState('eye');
 
@@ -94,6 +89,7 @@ const [errorMessage, setErrorMessage] = useState('');
       setIconName(iconName === 'eye' ? 'eye-off' : 'eye');
   };
 
+  // FRONT END
   return (
     <KeyboardAvoidingView style={styles.page} behavior='padding'>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
@@ -131,7 +127,6 @@ const [errorMessage, setErrorMessage] = useState('');
           )}
         </View>
         <CustomButton 
-          disabled={false}
           title="Login"
           buttonStyle={{
             marginTop: 20,
@@ -144,6 +139,7 @@ const [errorMessage, setErrorMessage] = useState('');
             fontSize: 22,
             fontWeight: '500',
           }}
+          disabled={!isFieldsFilled()}
           onPress = {handleLoginButtonPress}
         />
         <SafeAreaView style={{flexDirection:'row', marginTop: 40}} >

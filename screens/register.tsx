@@ -22,9 +22,6 @@ import React,{
   import Icon from 'react-native-vector-icons/Feather';
   import CustomButton from '../assets/properties/CustomButton';
 
-  // byrcrypt
-  const bycrypt = require('bcryptjs');
-
 const RegisterPage =  ({navigation} : any) => {
   // VARIABLES
   //email
@@ -49,6 +46,9 @@ const RegisterPage =  ({navigation} : any) => {
       setShowPassword(!showPassword);
       setIconName(iconName === 'eye' ? 'eye-off' : 'eye');
   };
+
+  // Error Message
+  const [errorMessage, setErrorMessage] = useState('');
 
   // for phone number
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -75,9 +75,6 @@ const RegisterPage =  ({navigation} : any) => {
   // Saving User data
   const saveUserData = async() =>{
     try {
-      const salt = await bycrypt.genSalt(10);
-      const hashedPassword = await bycrypt.hash(password, salt);
-
       firestore()
       .collection('user')
       .doc(email)
@@ -85,7 +82,7 @@ const RegisterPage =  ({navigation} : any) => {
         email_address: email,
         first_name: firstName,
         last_name: lastName,
-        password: hashedPassword,
+        password: password,
         phone_number: phoneNumber
       });
     return;
@@ -94,41 +91,33 @@ const RegisterPage =  ({navigation} : any) => {
     }
   }
 
-  // check repeat password match
-  const checkRepeatPassword = () =>{
-    if(password != confirmPassword){
-      setErrorMessage("Confirm Password not match!.");
-      console.log("password error");
-      return;
-    }else{
-      setErrorMessage('');
+  // handle submit
+  const handleSubmit = async() =>{
+    try {
+      if(password != confirmPassword){
+        setErrorMessage("Confirm Password not match!.");
+        console.log("password error");
+        return true;
+      }else{
+        const querySnapshot = await firestore()
+        .collection('user')
+        .doc(email)
+        .get();
+  
+        if(querySnapshot.exists){
+          setErrorMessage("Email Already Exist, please use a different email.");
+          return;
+        }else{
+          saveUserData();
+          setErrorMessage('');
+          navigation.navigate('Login');
+        }
+      }
+    } catch (error) {
+      console.error("Error handle submit");
       return;
     }
-  }
-
-  // check email
-  const [errorMessage, setErrorMessage] = useState('');
-  
-  const handleSubmit = async() =>{
-
-    checkRepeatPassword();
-    // try {
-      const querySnapshot = await firestore()
-      .collection('user')
-      .doc(email)
-      .get();
-
-      if(querySnapshot.exists){
-        setErrorMessage("Email Already Exist, please use a different email.");
-      }else{
-        saveUserData();
-        setErrorMessage('');
-      }
-      return;
-    // } catch (error) {
-    //   console.error("Error fetching data:", error);
-    //   throw error;
-    // }
+  return;
   };
 
   return(
