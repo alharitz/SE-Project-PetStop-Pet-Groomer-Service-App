@@ -14,16 +14,23 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  View
 } from 'react-native';
 
-import { AsyncStorageHook } from '@react-native-async-storage/async-storage/lib/typescript/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import  firestore  from '@react-native-firebase/firestore';
 
 import Icon from 'react-native-vector-icons/Feather';
 import CustomButton from '../assets/properties/CustomButton';
 
+// bycrypt
+const bycrypt = require('bcryptjs');
+
 const LoginPage = ({navigation}: any) => {
+// set error message
+const [errorMessage, setErrorMessage] = useState('');
+
   // Variables
   // Email
   const [email, onChangeEmail] = useState('');
@@ -34,23 +41,45 @@ const LoginPage = ({navigation}: any) => {
   // logged in
   const [isLoggedIn, setLoggedIn] = useState(false);
 
-  // Check for email and password
-  const checkCredential = () =>{
-    firestore()
-    .collection('user')
-    .doc(email)
-    .get()
-  }
+  // handle login button
+  const handleLoginButtonPress = async() =>{
+    try {
+      // fetching data
+      const querySnapshot = await firestore()
+      .collection('user')
+      .doc(email)
+      .get();
 
+      // cheking if the email match
+      if(querySnapshot.exists){
+        const userData = querySnapshot.data();
+        if(userData){
+          // compare password
+          const passwordMatch = await bycrypt.compare(password, userData.password);
 
-  // make the token for async storage
+          // checking if the password match
+          if(passwordMatch){
+            console.log(password)
+            await AsyncStorage.setItem('email',email); // saving login info
+            navigation.navigate('Index'); //navigate to home
+          }else{
+            setErrorMessage("Incorrect password!");
+          }
+          console.log(userData.password)
+          setErrorMessage("Error comparing password!");
+        }
 
-
-  const handleLoginButtonPress = () =>{
-    console.log("Login Button Clicked");
-  
-
-    navigation.navigate("Index");
+        // email not found
+      }else{
+        setErrorMessage("Email not found, please register first!");
+      }
+      
+      // error handling
+    } 
+    catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
   };
 
   const handleRegisterButtonPress = () => {
@@ -76,12 +105,16 @@ const LoginPage = ({navigation}: any) => {
         </Text>
         <TextInput
           style={styles.form}
+          onChangeText={onChangeEmail}
+          value={email}
           placeholder="youremail@mail.com" />
         <SafeAreaView style={styles.password_form_container}>
           <TextInput
             style={styles.form}
             placeholder="Password"
             secureTextEntry = {!showPassword}
+            onChangeText={onChangePassword}
+            value={password}
           />
             <TouchableOpacity  
               style={styles.eye_button}
@@ -90,11 +123,18 @@ const LoginPage = ({navigation}: any) => {
               <Icon name={iconName} size={27} color="grey"/>
           </TouchableOpacity>
         </SafeAreaView>
+        <View>
+        {errorMessage !== '' && (
+            <Text style={{color: 'red', marginTop:20}}>
+              {errorMessage}
+            </Text>
+          )}
+        </View>
         <CustomButton 
           disabled={false}
           title="Login"
           buttonStyle={{
-            marginTop: 45,
+            marginTop: 20,
             width: 300,
             height: 60,
             borderRadius: 20,

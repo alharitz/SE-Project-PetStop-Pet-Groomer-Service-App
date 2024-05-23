@@ -75,14 +75,9 @@ const RegisterPage =  ({navigation} : any) => {
   // Saving User data
   const saveUserData = async() =>{
     try {
-    // hasing password
-    let hashedPassword;
-    try {
-      const saltRounds = 10;
-      hashedPassword = await bycrypt.hash(password, saltRounds);
-    } catch (error) {
-      console.error("Couldn't hash password: ", error);
-    }
+      const salt = await bycrypt.genSalt(10);
+      const hashedPassword = await bycrypt.hash(password, salt);
+
       firestore()
       .collection('user')
       .doc(email)
@@ -100,10 +95,11 @@ const RegisterPage =  ({navigation} : any) => {
   }
 
   // check repeat password match
-  const checkRepeatPassowrd = () =>{
+  const checkRepeatPassword = () =>{
     if(password != confirmPassword){
       setErrorMessage("Confirm Password not match!.");
       console.log("password error");
+      return;
     }else{
       setErrorMessage('');
       return;
@@ -111,37 +107,29 @@ const RegisterPage =  ({navigation} : any) => {
   }
 
   // check email
- async function checkDuplicateEmail() {
-    try {
+  const [errorMessage, setErrorMessage] = useState('');
+  
+  const handleSubmit = async() =>{
+
+    checkRepeatPassword();
+    // try {
       const querySnapshot = await firestore()
       .collection('user')
       .doc(email)
       .get();
 
-     return querySnapshot.exists;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
-    }
- }
-  
-  const [errorMessage, setErrorMessage] = useState('');
-  const handleSubmit = () =>{
-    checkRepeatPassowrd();
-    checkDuplicateEmail().then(duplicateExist =>{
-      if(duplicateExist){
-       setErrorMessage("Email Already Exist, please use a different email.");
-       console.log("Email exist");
+      if(querySnapshot.exists){
+        setErrorMessage("Email Already Exist, please use a different email.");
       }else{
+        saveUserData();
         setErrorMessage('');
-        saveUserData()
-        // navigation.navigate("Login");
       }
-    });
+      return;
+    // } catch (error) {
+    //   console.error("Error fetching data:", error);
+    //   throw error;
+    // }
   };
-
-
-
 
   return(
     <KeyboardAvoidingView style={styles.page} behavior="padding">
