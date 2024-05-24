@@ -129,7 +129,7 @@ const RegisterPage =  ({navigation} : any) => {
         <View style={styles.form_container}>
           <TextInput
             style={styles.form}
-            placeholder='Firts Name'
+            placeholder='First Name'
             onChangeText={onChangeFirstName}
             value={firstName}
           />
@@ -189,7 +189,7 @@ const RegisterPage =  ({navigation} : any) => {
             activeOpacity={0.7}
             // onPress={()=> }
             >
-            <Text style={{color: '#4169e1', fontSize: 14}}> Terms and Conditons</Text>
+            <Text style={{color: '#4169e1', fontSize: 14}}> Terms and Conditions</Text>
           </TouchableOpacity>
           <CheckBox
             value={isSelected}

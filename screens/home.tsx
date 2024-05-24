@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesomeIcon6 from 'react-native-vector-icons/FontAwesome6';
-import MaterialComunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const HomePage = ({ navigation }: any) => {
   return (
@@ -51,7 +51,7 @@ const HomePage = ({ navigation }: any) => {
             activeOpacity={0.7}
             onPress={() => navigation.navigate('PetForum')}>
             <View style={styles.feature_content}>
-              <MaterialComunityIcons style={styles.feature_icon} name='forum' size={50} color={'white'} />
+              <MaterialCommunityIcons style={styles.feature_icon} name='forum' size={50} color={'white'} />
               <Text style={styles.feature_text}>Pet Forum</Text>
             </View>
           </TouchableOpacity>
