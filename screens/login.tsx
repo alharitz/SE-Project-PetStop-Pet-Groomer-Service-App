@@ -1,8 +1,8 @@
 // NOTES
-// 1. adding some respon when user typing
+// 1. adding some response when user typing
 // 2. making sure all the fields are filled
 // 3. adding hook to the backend
-// 4. adding token for asycn storage
+// 4. adding token for async storage
 
 import React,{
   useState
@@ -51,7 +51,7 @@ const LoginPage = ({navigation}: any) => {
       .doc(email)
       .get();
 
-      // cheking if the email match
+      // checking if the email match
       if(querySnapshot.exists){
         const userData = querySnapshot.data();
         if(userData){
