@@ -24,7 +24,7 @@ const HomePage = ({ navigation }: any) => {
         if (userDoc.exists) {
           const userData = userDoc.data();
           if(userData){
-            setUserName(userData.first_name);
+            setUserName(userData.first_name + " " + userData.last_name);
           }else{
             console.log('Data does not exist');
           }
@@ -52,7 +52,7 @@ const HomePage = ({ navigation }: any) => {
         activeOpacity={0.7}
         onPress={() => {navigation.navigate('Profile')}}>
         <View>
-          <Text style={styles.title}>Hello,{'\n'} {userName} </Text>
+          <Text style={styles.title}>Hello,{'\n'}{userName}</Text>
         </View>
       </TouchableOpacity>
 
