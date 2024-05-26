@@ -17,6 +17,7 @@ import React,{
   
   import CheckBox from '@react-native-community/checkbox';
   import firestore from '@react-native-firebase/firestore';
+  import auth from '@react-native-firebase/auth';
   
   // Icon
   import Icon from 'react-native-vector-icons/Feather';
@@ -72,25 +73,6 @@ const RegisterPage =  ({navigation} : any) => {
   // Terms and condition check
   const [isSelected, setSelection] = useState(false);
 
-  // Saving User data
-  const saveUserData = async() =>{
-    try {
-      firestore()
-      .collection('user')
-      .doc(email)
-      .set({
-        email_address: email,
-        first_name: firstName,
-        last_name: lastName,
-        password: password,
-        phone_number: phoneNumber
-      });
-    return;
-    } catch (error) {
-      console.error("Error saving user credential: ", error);
-    }
-  }
-
   // handle submit
   const handleSubmit = async() =>{
     try {
@@ -98,7 +80,7 @@ const RegisterPage =  ({navigation} : any) => {
         setErrorMessage("Confirm Password not match!.");
         console.log("password error");
         return true;
-      }else{
+      } else {
         const querySnapshot = await firestore()
         .collection('user')
         .doc(email)
@@ -107,9 +89,23 @@ const RegisterPage =  ({navigation} : any) => {
         if(querySnapshot.exists){
           setErrorMessage("Email Already Exist, please use a different email.");
           return;
-        }else{
-          saveUserData();
-          setErrorMessage('');
+        } else {
+          try {
+            const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+            const { uid } = userCredential.user;
+
+            await firestore()
+              .collection('user')
+              .doc(uid)
+              .set({
+                first_name: firstName,
+                last_name: lastName,
+                email,
+                phone_number: phoneNumber
+              });
+          } catch (error){
+            setErrorMessage('');
+          }
           navigation.navigate('Login');
         }
       }

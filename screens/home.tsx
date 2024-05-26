@@ -1,9 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesomeIcon6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
 const HomePage = ({ navigation }: any) => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth().currentUser;
+      if (user) {
+        const uid = user.uid;
+        try {
+          const userDoc = await firestore().collection('user').doc(uid).get();
+          if (userDoc.exists) {
+            setUserData(userDoc.data());
+          } else {
+            console.log('No such document!');
+          }
+        } catch (error) {
+          console.error('Error fetching user data: ', error);
+        }
+      } else {
+        console.log('No user is logged in');
+      }
+      setLoading(false);
+    };
+
+    fetchUserData();
+  }, []);
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
   return (
     <View style={styles.page}>
       <TouchableOpacity
@@ -11,7 +45,7 @@ const HomePage = ({ navigation }: any) => {
         activeOpacity={0.7}
         onPress={() => {navigation.navigate('Profile')}}>
         <View>
-          <Text style={styles.title}>Hello,{'\n'}Fatih Achmad Al-Haritz </Text>
+          <Text style={styles.title}>Hello,{'\n'} {userData.first_name} </Text>
         </View>
       </TouchableOpacity>
 

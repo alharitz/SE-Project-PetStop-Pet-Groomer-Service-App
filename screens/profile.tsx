@@ -8,21 +8,17 @@ import React,{
     StyleSheet,
     TouchableOpacity,
   } from 'react-native';
+import auth from '@react-native-firebase/auth';
 
 const ProfilePage = ({navigation}:any) =>{
+
   
   const handleLogOut = async ()=>{
     try {
-      const userId = await AsyncStorage.getItem('email');
-      if(userId){
-        await AsyncStorage.removeItem('email');
-        navigation.navigate('Login');
-        return;
-      }else{
-        console.log("Couldn't Log out");
-      }
+      await auth().signOut(); // Sign out
+      navigation.navigate('Login'); // Navigate ke login
     } catch (error) {
-      
+      console.error('Error signing out:', error); // handle error
     }
   }
     return(

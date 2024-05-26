@@ -5,6 +5,7 @@
 // 4. adding token for async storage
 
 import React,{
+  useId,
   useState
 } from 'react';
 import {
@@ -15,11 +16,13 @@ import {
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
-  View
+  View,
+  Alert
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import  firestore  from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 import Icon from 'react-native-vector-icons/Feather';
 import CustomButton from '../assets/properties/CustomButton';
@@ -42,37 +45,42 @@ const LoginPage = ({navigation}: any) => {
        password.trim() !== '';
   }
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   // handle login button
   const handleLoginButtonPress = async() =>{
-    try {
-      // fetching data
-      const querySnapshot = await firestore()
-      .collection('user')
-      .doc(email)
-      .get();
-
-      // checking if the email match
-      if(querySnapshot.exists){
-        const userData = querySnapshot.data();
-        if(userData){
-          if(password === userData.password){     // checking if the password match
-            await AsyncStorage.setItem('email',email);      // saving login info
-            setErrorMessage('');
-            navigation.navigate('Index');     //navigate to home
-          }else{
-            setErrorMessage("Incorrect password!");
-            return;
-          }
-        }
-      }else{
-        setErrorMessage("Email not found, please register first!");     // email not found
-        return;
-      }
-    } 
-    catch (error) {     // error handling
-      console.error("Error fetching data:", error);
-      throw error;
+    setLoading(true);
+    setError('');
+    try{
+      await auth().signInWithEmailAndPassword(email, password);
+      navigation.navigate('Index');
+    } catch (error) {
+      Alert.alert('Login Failed', error.message);
     }
+    setLoading(false);
+
+    //   // checking if the email match
+    //   if(querySnapshot.exists){
+    //     const userData = querySnapshot.data();
+    //     if(userData){
+    //       if(password === userData.password){     // checking if the password match
+    //         await AsyncStorage.setItem('email',email);      // saving login info
+    //         setErrorMessage('');
+    //         navigation.navigate('Index');     //navigate to home
+    //       }else{
+    //         setErrorMessage("Incorrect password!");
+    //         return;
+    //       }
+    //     }
+    //   }else{
+    //     setErrorMessage("Email not found, please register first!");     // email not found
+    //     return;
+    //   }
+    // } 
+    // catch (error) {     // error handling
+    //   console.error("Error fetching data:", error);
+    //   throw error;
+    // }
   };
 
   // handle register password
