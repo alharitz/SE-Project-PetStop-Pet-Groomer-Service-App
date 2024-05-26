@@ -26,6 +26,7 @@ import auth from '@react-native-firebase/auth';
 
 import Icon from 'react-native-vector-icons/Feather';
 import CustomButton from '../assets/properties/CustomButton';
+import LoadingPage from './loading';
 
 // BACK END
 const LoginPage = ({navigation}: any) => {
@@ -45,42 +46,22 @@ const LoginPage = ({navigation}: any) => {
        password.trim() !== '';
   }
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   // handle login button
   const handleLoginButtonPress = async() =>{
-    setLoading(true);
-    setError('');
     try{
       await auth().signInWithEmailAndPassword(email, password);
       navigation.navigate('Index');
-    } catch (error) {
-      Alert.alert('Login Failed', error.message);
+    } catch (error:any) {
+      console.error(error);
+      if (error.code === 'auth/invalid-credential') {
+        setErrorMessage('Email or password incorrect!');
+      } else if (error.code === 'auth/invalid-email') {
+        setErrorMessage('Incorrect email format');
+      } else {
+        setErrorMessage("Login Error");
+        console.error("Login error:", error);
+     }
     }
-    setLoading(false);
-
-    //   // checking if the email match
-    //   if(querySnapshot.exists){
-    //     const userData = querySnapshot.data();
-    //     if(userData){
-    //       if(password === userData.password){     // checking if the password match
-    //         await AsyncStorage.setItem('email',email);      // saving login info
-    //         setErrorMessage('');
-    //         navigation.navigate('Index');     //navigate to home
-    //       }else{
-    //         setErrorMessage("Incorrect password!");
-    //         return;
-    //       }
-    //     }
-    //   }else{
-    //     setErrorMessage("Email not found, please register first!");     // email not found
-    //     return;
-    //   }
-    // } 
-    // catch (error) {     // error handling
-    //   console.error("Error fetching data:", error);
-    //   throw error;
-    // }
   };
 
   // handle register password

@@ -83,16 +83,16 @@ const RegisterPage =  ({navigation} : any) => {
       } else {
         const querySnapshot = await firestore()
         .collection('user')
-        .doc(email)
+        .where('email', '==', email)
         .get();
   
-        if(querySnapshot.exists){
+        if(!querySnapshot.empty){
           setErrorMessage("Email Already Exist, please use a different email.");
-          return;
+          
         } else {
           try {
             const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-            const { uid } = userCredential.user;
+            const { uid }  = userCredential.user;
 
             await firestore()
               .collection('user')
@@ -103,10 +103,19 @@ const RegisterPage =  ({navigation} : any) => {
                 email,
                 phone_number: phoneNumber
               });
-          } catch (error){
-            setErrorMessage('');
+
+            navigation.navigate('Login');
+
+          } catch (error:any){
+            if(error.code === 'auth/weak-password'){ 
+              setErrorMessage("Password atleast 6 characters!");
+            }else if(error.code === 'auth/invalid-email'){
+              setErrorMessage("Invalid email address!");
+            }else{
+              console.error(error);
+              setErrorMessage("Error Saving Credential");
+            }
           }
-          navigation.navigate('Login');
         }
       }
     } catch (error) {
@@ -192,7 +201,7 @@ const RegisterPage =  ({navigation} : any) => {
             onValueChange={() => setSelection(!isSelected)}
             tintColors={{ true: '#4630EB', false: undefined }}/>
         </View>
-        <View>
+        <View style={{display: 'flex', alignItems: 'center'}}>
           {errorMessage !== '' && (
             <Text style={{color: 'red'}}>
               {errorMessage}

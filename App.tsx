@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import auth from '@react-native-firebase/auth';
 
 // import screen
 import Index from './screens/index';
@@ -13,7 +13,7 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
   // variables
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(false);
   const [isLoggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => { // using useEffect so that the app can run many task at the same time
@@ -22,10 +22,11 @@ const App = () => {
 
   // cheking login status using async storage that store data locally
   const checkLoginStatus = async () => {
+    setLoading(true);
     try {
       // using email as an id
-      const UserId = await AsyncStorage.getItem('email');
-      if (UserId !== null) {
+      const user = auth().currentUser;
+      if (user !== null) {
         setLoggedIn(true);
       }
     } catch (error) {

@@ -1,8 +1,9 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// screen
+// screens
 import HistoryPage from "./history";
 import NotificationPage from "./notification";
 import ProfilePage from "./profile";
@@ -18,7 +19,7 @@ const Tab = createBottomTabNavigator();
 const HomeStack = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomePage} options={{ headerShown: false }} />
+      <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }} />
       <Stack.Screen name="PetGroomer" component={PetGroomer} />
       <Stack.Screen name="PetHotel" component={PetHotel} />
       <Stack.Screen name="PetDoctor" component={PetDoctor} />
@@ -30,7 +31,29 @@ const HomeStack = () => {
 const Index = () => {
   return (
     <Tab.Navigator
-    screenOptions={{tabBarStyle:{height: 60}}}>
+    initialRouteName="Home"
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName = 'home'; // Default icon name
+
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'History') {
+            iconName = 'history';
+          } else if (route.name === 'Notification') {
+            iconName = focused ? 'bell' : 'bell-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'account' : 'account-outline';
+          }
+
+          // Return the MaterialCommunityIcons component with the correct icon name
+          return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#FFA600',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: { height: 60 },
+      })}
+    >
       <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
       <Tab.Screen name="History" component={HistoryPage} options={{ headerShown: false }} />
       <Tab.Screen name="Notification" component={NotificationPage} options={{ headerShown: false }} />

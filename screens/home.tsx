@@ -5,37 +5,44 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import LoadingPage from './loading';
 
 const HomePage = ({ navigation }: any) => {
-  const [userData, setUserData] = useState(null);
+  const [userName, setUserName] = useState('Name Surname');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth().currentUser;
-      if (user) {
-        const uid = user.uid;
-        try {
-          const userDoc = await firestore().collection('user').doc(uid).get();
-          if (userDoc.exists) {
-            setUserData(userDoc.data());
-          } else {
-            console.log('No such document!');
-          }
-        } catch (error) {
-          console.error('Error fetching user data: ', error);
-        }
-      } else {
-        console.log('No user is logged in');
-      }
-      setLoading(false);
-    };
-
     fetchUserData();
   }, []);
 
+  const fetchUserData = async () => {
+    const user = auth().currentUser;
+    if (user) {
+      const uid = user.uid;
+      try {
+        const userDoc = await firestore().collection('user').doc(uid).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          if(userData){
+            setUserName(userData.first_name);
+          }else{
+            console.log('Data does not exist');
+          }
+        } else {
+          console.log('No such document!');
+        }
+      } catch (error) {
+        console.error('Error fetching user data: ', error);
+      }
+    } else {
+      console.log('No user is logged in');
+    }
+    setLoading(false);
+  };
+
   if (loading) {
-    return <Text>Loading...</Text>;
+    // return <Text style={{color: 'black', fontSize: 32, display: 'flex', justifyContent: 'center'}}>Loading...</Text>;
+    return <LoadingPage/>
   }
 
   return (
@@ -45,7 +52,7 @@ const HomePage = ({ navigation }: any) => {
         activeOpacity={0.7}
         onPress={() => {navigation.navigate('Profile')}}>
         <View>
-          <Text style={styles.title}>Hello,{'\n'} {userData.first_name} </Text>
+          <Text style={styles.title}>Hello,{'\n'} {userName} </Text>
         </View>
       </TouchableOpacity>
 
