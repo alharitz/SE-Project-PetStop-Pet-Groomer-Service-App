@@ -41,7 +41,6 @@ const HomePage = ({ navigation }: any) => {
   };
 
   if (loading) {
-    // return <Text style={{color: 'black', fontSize: 32, display: 'flex', justifyContent: 'center'}}>Loading...</Text>;
     return <LoadingPage/>
   }
 

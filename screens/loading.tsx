@@ -1,5 +1,4 @@
 import React from "react";
-import LoginPage from './Login.tsx';
 import { 
     Text,
     View,

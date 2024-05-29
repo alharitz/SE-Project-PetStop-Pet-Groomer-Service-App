@@ -18,7 +18,7 @@ const Tab = createBottomTabNavigator();
 
 const HomeStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="HomePage">
       <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }} />
       <Stack.Screen name="PetGroomer" component={PetGroomer} />
       <Stack.Screen name="PetHotel" component={PetHotel} />
@@ -31,7 +31,7 @@ const HomeStack = () => {
 const Index = () => {
   return (
     <Tab.Navigator
-    initialRouteName="Profile"
+    initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName = 'home'; // Default icon name
