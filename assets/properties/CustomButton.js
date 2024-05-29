@@ -8,7 +8,7 @@ import {
 const CustomButton = ({disabled, onPress, title, buttonStyle, textStyle}) => {
   return (
     <TouchableOpacity
-      style={[styles.custom_button, buttonStyle, disabled && styles.disabled_button]}
+      style={[styles.custom_button,styles.elevation, buttonStyle, disabled && styles.disabled_button]}
       onPress={onPress}
       activeOpacity={0.7}
       disabled={disabled}>
@@ -18,6 +18,9 @@ const CustomButton = ({disabled, onPress, title, buttonStyle, textStyle}) => {
 };
 
 const styles = StyleSheet.create({
+  elevation: {
+    elevation: 5
+  },
   custom_button: {
     justifyContent: 'center',
     alignItems: 'center',
