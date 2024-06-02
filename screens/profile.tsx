@@ -6,7 +6,6 @@ import React,{
     View,
     Text, 
     StyleSheet,
-    TouchableOpacity,
     ScrollView,
     Image,
   } from 'react-native';
@@ -38,7 +37,10 @@ const ProfilePage = ({navigation}:any) =>{
   const handleLogOut = async ()=>{
     try {
       await auth().signOut(); // Sign out
-      navigation.navigate('Login'); // Navigate ke login
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
     } catch (error) {
       console.error('Error signing out:', error); // handle error
     }
@@ -46,7 +48,7 @@ const ProfilePage = ({navigation}:any) =>{
 
   // Handle Edit Profile
   const handleEditProfile = ()=>{
-    
+    navigation.navigate('Edit Profile');
   }
 
     return(
@@ -86,7 +88,7 @@ const ProfilePage = ({navigation}:any) =>{
             buttonStyle={{
               width: 300,
               height: 50,
-              borderRadius: 25,
+              borderRadius: 20,
               marginTop: 20,
             }}
             textStyle={{
@@ -102,7 +104,7 @@ const ProfilePage = ({navigation}:any) =>{
             buttonStyle={{
               width: 300,
               height: 50,
-              borderRadius: 25,
+              borderRadius: 20,
               marginVertical: 20,
             }}
             textStyle={{
@@ -132,7 +134,7 @@ const style = StyleSheet.create({
     marginTop: 10,
     fontSize: 30,
     fontWeight: '800',
-    color: 'black'
+    color: '#495057'
   },
   
 })

@@ -8,13 +8,14 @@ import Index from './screens/index';
 import LoginPage from './screens/login';
 import LoadingPage from './screens/loading';    
 import RegisterPage from './screens/register';
+import EditProfile from './screens/editProfile';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   // variables
   const [isLoading, setLoading] = useState(false);
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [isLoggedIn, setLoggedIn] = useState(true);
 
   useEffect(() => { // using useEffect so that the app can run many task at the same time
     checkLoginStatus(); 
@@ -42,12 +43,16 @@ const App = () => {
   }
 
   return (
+
     <NavigationContainer>
+      {/* <Index/> */}
     {/* Cheking whether user data is stored (isLoggedIn) or not */}
       <Stack.Navigator initialRouteName={isLoggedIn ? 'Index' : 'Login'}>
+      {/* <Stack.Navigator initialRouteName='Edit Profile'> */}
         <Stack.Screen name='Login' component={LoginPage} options={{ headerShown: false }} />
         <Stack.Screen name='Register' component={RegisterPage} options={{ headerShown: false }} />
         <Stack.Screen name='Index' component={Index} options={{ headerShown: false }} />
+        <Stack.Screen name='Edit Profile' component={EditProfile} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

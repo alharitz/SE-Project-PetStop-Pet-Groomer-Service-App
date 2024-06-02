@@ -31,7 +31,7 @@ const HomeStack = () => {
 const Index = () => {
   return (
     <Tab.Navigator
-    initialRouteName="Home"
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName = 'home'; // Default icon name
@@ -51,7 +51,7 @@ const Index = () => {
         },
         tabBarActiveTintColor: '#FFA600',
         tabBarInactiveTintColor: 'gray',
-        tabBarStyle: { height: 70, paddingBottom: 10, paddingTop: 10},
+        tabBarStyle: { height: 70, paddingBottom: 10, paddingTop: 10 },
       })}
     >
       <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />

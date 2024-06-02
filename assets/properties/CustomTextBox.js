@@ -24,18 +24,18 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         fontSize: 18,
         fontWeight: '700',
-        color: 'black'
+        color: '#343a40'
     },
     text_style: {
         marginLeft: 5,
         marginVertical: 5,
         fontSize: 16,
-        color: 'black',
+        color: '#6c757d',
         fontWeight: '500'
     },
     underline: {
 
-        borderBottomColor: 'black',
+        borderBottomColor: '#495057',
         borderBottomWidth: 1,
         width: '90%' // Ensures the underline stretches to the width of the parent
     }

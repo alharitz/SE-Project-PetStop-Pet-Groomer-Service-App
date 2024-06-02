@@ -50,7 +50,10 @@ const LoginPage = ({navigation}: any) => {
   const handleLoginButtonPress = async() =>{
     try{
       await auth().signInWithEmailAndPassword(email, password);
-      navigation.navigate('Index');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Index' }],
+      });
     } catch (error:any) {
       console.error(error);
       if (error.code === 'auth/invalid-credential') {
