@@ -16,21 +16,49 @@ import CustomButton from '../assets/properties/CustomButton';
 import CustomTextBox from '../assets/properties/CustomTextBox';
 
 const ProfilePage = ({navigation}:any) =>{
+  const [userName, setUserName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [Address, setAddress] = useState('');
+  const [loading, setLoading] = useState(true);
+
   useEffect(() =>{
-    fetchingUserData();
+    fetchUserData();
   }, []);
 
-  const user = auth().currentUser;
-  const uid = user?.uid
-  const fetchingUserData = async()=>{
-    try {
-      const userData = await firestore()
-      .collection('user')
-      .doc(uid)
-      .get();
-    } catch (error) {
-      
+  const fetchUserData = async () => {
+    const user = auth().currentUser;
+    if (user) {
+      const uid = user.uid;
+      try {
+        const userDoc = await firestore()
+          .collection('user')
+          .doc(uid)
+          .get();
+
+        if (userDoc.exists){
+          const userData = userDoc.data();
+          if(userData){
+            setUserName(userData.first_name + " " + userData.last_name);
+            setFirstName(userData.first_name);
+            setLastName(userData.last_name);
+            setEmailAddress(userData.email);
+            setPhoneNumber(userData.phone_number);
+          } else {
+            console.log('Data does not exist!');
+          }
+        } else {
+          console.log('Document does not exist!');
+        }
+      } catch (error) {
+        console.error('Error fetching user data: ', error);
+      }
+    } else {
+      console.log('No user is logged in');
     }
+    setLoading(false);
   }
   
   // Handle LogOut
@@ -57,27 +85,27 @@ const ProfilePage = ({navigation}:any) =>{
           <Image 
           source={require('./images/logoFix.png')}
           style = {style.profile_pict}/>
-          <Text style={style.tittle}>Name Surname</Text>
+          <Text style={style.tittle}>{userName}</Text>
         </View>
         <View style={{marginLeft: 10}}>
           <CustomTextBox 
           title="First Name" 
-          text="Name" // << insert variables here
+          text={firstName} // << insert variables here
           />
           <CustomTextBox 
           title="Last Name" 
-          text="Surname" // << insert variables here
+          text={lastName} // << insert variables here
           />
           <CustomTextBox 
           title="Email Address" 
-          text="name.surname@mail.com" // << insert variables here
+          text={emailAddress} // << insert variables here
           />
           <CustomTextBox 
           title="Phone Number" 
-          text="12345678910" // << insert variables here
+          text={phoneNumber} // << insert variables here
           />
           <CustomTextBox 
-          title="Adress" 
+          title="Address"  //insert address jgn lupa
           text="st. lorem ipsum dolor sit amet" // << insert variables here
           />
     
