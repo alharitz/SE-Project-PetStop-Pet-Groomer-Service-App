@@ -19,7 +19,7 @@ const CustomButton = ({disabled, onPress, title, buttonStyle, textStyle}) => {
 
 const styles = StyleSheet.create({
   elevation: {
-    elevation: 5
+    elevation: 2
   },
   custom_button: {
     justifyContent: 'center',

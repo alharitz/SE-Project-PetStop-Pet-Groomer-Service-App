@@ -6,12 +6,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 // screens
 import HistoryPage from "./history";
 import NotificationPage from "./notification";
-import ProfilePage from "./profile";
 import PetGroomer from "./petGroomer";
 import PetHotel from "./petHotel";
 import PetDoctor from "./petDoctor";
 import PetForum from "./petForum";
 import HomePage from "./home";
+import ProfilePage from "./profile";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

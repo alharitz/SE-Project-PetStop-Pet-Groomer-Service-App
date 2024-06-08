@@ -201,7 +201,7 @@ const RegisterPage =  ({navigation} : any) => {
             onValueChange={() => setSelection(!isSelected)}
             tintColors={{ true: '#4630EB', false: undefined }}/>
         </View>
-        <View style={{display: 'flex', alignItems: 'center'}}>
+        <View style={{flex: 1,display: 'flex', alignItems: 'center'}}>
           {errorMessage !== '' && (
             <Text style={{color: 'red'}}>
               {errorMessage}
@@ -212,7 +212,7 @@ const RegisterPage =  ({navigation} : any) => {
             buttonStyle={{
               width: 300,
               height: 60,
-              borderRadius: 20,
+              borderRadius: 40,
               marginTop: 20,
             }}
             textStyle={{
@@ -237,6 +237,7 @@ const  styles = StyleSheet.create({
   },
 
   container:{
+    flex: 1,
     flexDirection:"column",
     alignItems: "center",
   },

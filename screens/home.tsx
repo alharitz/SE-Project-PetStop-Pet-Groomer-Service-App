@@ -8,7 +8,7 @@ import firestore from '@react-native-firebase/firestore';
 import LoadingPage from './loading';
 
 const HomePage = ({ navigation }: any) => {
-  const [userName, setUserName] = useState('Name Surname');
+  const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

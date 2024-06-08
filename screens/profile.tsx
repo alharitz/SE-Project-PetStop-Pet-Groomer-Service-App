@@ -1,30 +1,24 @@
-import React,{
-  useEffect,
-    useState
-  } from 'react';
-  import {
-    View,
-    Text, 
-    StyleSheet,
-    ScrollView,
-    Image,
-  } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text, 
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 
-import firestore from '@react-native-firebase/firestore'
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import CustomButton from '../assets/properties/CustomButton';
-import CustomTextBox from '../assets/properties/CustomTextBox';
+import CustomProfileButton from '../assets/properties/CustomProfileButton';
+import LoadingPage from './loading';
 
-const ProfilePage = ({navigation}:any) =>{
+const ProfilePage = ({ navigation }:any) => {
   const [userName, setUserName] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [emailAddress, setEmailAddress] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [Address, setAddress] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() =>{
+  useEffect(() => {
     fetchUserData();
   }, []);
 
@@ -38,14 +32,10 @@ const ProfilePage = ({navigation}:any) =>{
           .doc(uid)
           .get();
 
-        if (userDoc.exists){
+        if (userDoc.exists) {
           const userData = userDoc.data();
-          if(userData){
+          if (userData) {
             setUserName(userData.first_name + " " + userData.last_name);
-            setFirstName(userData.first_name);
-            setLastName(userData.last_name);
-            setEmailAddress(userData.email);
-            setPhoneNumber(userData.phone_number);
           } else {
             console.log('Data does not exist!');
           }
@@ -59,10 +49,10 @@ const ProfilePage = ({navigation}:any) =>{
       console.log('No user is logged in');
     }
     setLoading(false);
-  }
-  
+  };
+
   // Handle LogOut
-  const handleLogOut = async ()=>{
+  const handleLogOut = async () => {
     try {
       await auth().signOut(); // Sign out
       navigation.reset({
@@ -72,99 +62,90 @@ const ProfilePage = ({navigation}:any) =>{
     } catch (error) {
       console.error('Error signing out:', error); // handle error
     }
+  };
+
+  if (loading) {
+    return (
+      <LoadingPage/>
+    );
   }
 
-  // Handle Edit Profile
-  const handleEditProfile = ()=>{
-    navigation.navigate('Edit Profile');
-  }
-
-    return(
-      <ScrollView>
-        <View style={style.profile_name_pict_container}>
+  return (
+    <ScrollView contentContainerStyle={style.page}>
+      <View style={{ alignItems: 'center', marginHorizontal: 20 }}>
+        <View style={[style.profile_name_pict_container, style.elevation]}>
           <Image 
-          source={require('./images/logoFix.png')}
-          style = {style.profile_pict}/>
+            source={require('./images/logoFix.png')}
+            style={style.profile_pict} 
+          />
           <Text style={style.tittle}>{userName}</Text>
         </View>
-        <View style={{marginLeft: 10}}>
-          <CustomTextBox 
-          title="First Name" 
-          text={firstName} // << insert variables here
-          />
-          <CustomTextBox 
-          title="Last Name" 
-          text={lastName} // << insert variables here
-          />
-          <CustomTextBox 
-          title="Email Address" 
-          text={emailAddress} // << insert variables here
-          />
-          <CustomTextBox 
-          title="Phone Number" 
-          text={phoneNumber} // << insert variables here
-          />
-          <CustomTextBox 
-          title="Address"  //insert address jgn lupa
-          text="st. lorem ipsum dolor sit amet" // << insert variables here
-          />
-    
-        </View>
-        <View style={{alignItems: 'center'}}>
-          <CustomButton
-            title="Edit Profile"
-            buttonStyle={{
-              width: 300,
-              height: 50,
-              borderRadius: 20,
-              marginTop: 20,
-            }}
-            textStyle={{
-              color: 'white',
-              fontSize: 16,
-              fontWeight: '600',
-            }}
-            disabled={false}
-            onPress={handleEditProfile}/>
-
-            <CustomButton
-            title="Log Out"
-            buttonStyle={{
-              width: 300,
-              height: 50,
-              borderRadius: 20,
-              marginVertical: 20,
-            }}
-            textStyle={{
-              color: 'white',
-              fontSize: 16,
-              fontWeight: '600',
-            }}
-            disabled={false}
-            onPress={handleLogOut}/>
-        </View>
-      </ScrollView>
-
-    );
+      </View>
+      <View style={{ marginHorizontal: 20 }}>
+        <CustomProfileButton title={'Account'} icon={'account-outline'} onPress={() => { navigation.navigate('Account') }} />
+        <CustomProfileButton title={'Address'} icon={'home-outline'} onPress={() => { }} />
+        <CustomProfileButton title={'Notification'} icon={'bell-outline'} onPress={() => { }} />
+        <CustomProfileButton title={'History'} icon={'history'} onPress={() => { }} />
+        <CustomProfileButton title={'Contact Us'} icon={'phone'} onPress={() => { }} />
+      </View>
+      <View style={style.logoutButtonContainer}>
+        <CustomButton
+          title="Log Out"
+          buttonStyle={style.logoutButton}
+          textStyle={style.logoutButtonText}
+          disabled={false}
+          onPress={handleLogOut}
+        />
+      </View>
+    </ScrollView>
+  );
 };
 
 const style = StyleSheet.create({
+  page: {
+    backgroundColor: '#f2f2f2',
+    flex: 1,
+    justifyContent: 'space-between',
+  },
   profile_name_pict_container: {
-    display: 'flex',
+    width: '100%',
+    height: 210,
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 30,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 30,
+    backgroundColor: '#e9ecef',
   },
   profile_pict: {
-    width: 160,
-    height: 160
+    width: 100,
+    height: 100,
   },
-  tittle:{
+  tittle: {
     marginTop: 10,
-    fontSize: 30,
-    fontWeight: '800',
-    color: '#495057'
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#495057',
   },
-  
-})
+  logoutButtonContainer: {
+    alignItems: 'center',
+    marginBottom: 30
+  },
+  logoutButton: {
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: '#FA751C',
+    width: 300,
+    height: 50,
+    borderRadius: 30,
+  },
+  logoutButtonText: {
+    color: '#FA751C',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  elevation: {
+    elevation: 5,
+  }
+});
 
 export default ProfilePage;

@@ -81,6 +81,11 @@ const LoginPage = ({navigation}: any) => {
       setIconName(iconName === 'eye' ? 'eye-off' : 'eye');
   };
 
+  // handle forget password
+  const handleForgetPassword = ()=>{
+
+  }
+
   // FRONT END
   return (
     <KeyboardAvoidingView style={styles.page} behavior='padding'>
@@ -111,8 +116,15 @@ const LoginPage = ({navigation}: any) => {
               <Icon name={iconName} size={27} color="grey"/>
           </TouchableOpacity>
         </SafeAreaView>
-        <View>
-        {errorMessage !== '' && (
+        <View style={{position: 'relative', marginTop: 20,}}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleForgetPassword}>
+            <Text style={{fontWeight:'bold',fontSize: 16, color: '#ed9121'}}>Forget Password</Text>
+          </TouchableOpacity>
+        </View>
+        <View> 
+          {errorMessage !== '' && (
             <Text style={{color: 'red', marginTop:20}}>
               {errorMessage}
             </Text>
@@ -121,10 +133,10 @@ const LoginPage = ({navigation}: any) => {
         <CustomButton 
           title="Login"
           buttonStyle={{
-            marginTop: 20,
+            marginTop: 30,
             width: 300,
             height: 60,
-            borderRadius: 20,
+            borderRadius: 50,
           }}
           textStyle={{
             color: 'white',
@@ -134,15 +146,14 @@ const LoginPage = ({navigation}: any) => {
           disabled={!isFieldsFilled()}
           onPress = {handleLoginButtonPress}
         />
-        <SafeAreaView style={{flexDirection:'row', marginTop: 40}} >
+        <SafeAreaView style={{flexDirection:'row', marginTop: 30}} >
           <Text style={{fontSize: 16, color: 'black'}}>
               Don't have an account yet?,
           </Text>
           <TouchableOpacity
               activeOpacity={0.7}
               onPress={handleRegisterButtonPress}>
-              <Text style={{fontWeight:'bold',fontSize: 16, color: '#ed9121'}}> Register here
-                 </Text>
+              <Text style={{fontWeight:'bold',fontSize: 16, color: '#ed9121'}}> Register here</Text>
           </TouchableOpacity>
         </SafeAreaView>
       </ScrollView>
