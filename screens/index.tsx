@@ -18,9 +18,17 @@ const Tab = createBottomTabNavigator();
 
 const HomeStack = () => {
   return (
-    <Stack.Navigator initialRouteName="HomePage">
+    <Stack.Navigator
+      initialRouteName="HomePage"
+      screenOptions={{
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
       <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }} />
-      <Stack.Screen name="PetGroomer" component={PetGroomer} />
+      <Stack.Screen name="Pet Groomer" component={PetGroomer} />
       <Stack.Screen name="PetHotel" component={PetHotel} />
       <Stack.Screen name="PetDoctor" component={PetDoctor} />
       <Stack.Screen name="PetForum" component={PetForum} />
@@ -49,9 +57,15 @@ const Index = () => {
           // Return the MaterialCommunityIcons component with the correct icon name
           return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#FFA600',
+        tabBarActiveTintColor: '#FA751C',
         tabBarInactiveTintColor: 'gray',
-        tabBarStyle: { height: 70, paddingBottom: 10, paddingTop: 10 },
+        tabBarStyle: { 
+          height: 70, 
+          paddingBottom: 10, 
+          paddingTop: 10, 
+          borderTopWidth: 3,
+          borderTopColor: '#FA751C',
+        },
       })}
     >
       <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />

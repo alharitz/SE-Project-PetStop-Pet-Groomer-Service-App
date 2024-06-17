@@ -60,7 +60,7 @@ const HomePage = ({ navigation }: any) => {
           <TouchableOpacity
             style={[styles.feature_button, styles.elevation]}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate('PetGroomer')}>
+            onPress={() => navigation.navigate('Pet Groomer')}>
             <View style={styles.feature_content}>
               <FontAwesomeIcon6 style={styles.feature_icon} name='cat' size={50} color={'white'} />
               <Text style={styles.feature_text}>Pet Groomer</Text>

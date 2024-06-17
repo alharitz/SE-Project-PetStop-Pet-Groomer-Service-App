@@ -116,7 +116,7 @@ const LoginPage = ({navigation}: any) => {
               <Icon name={iconName} size={27} color="grey"/>
           </TouchableOpacity>
         </SafeAreaView>
-        <View style={{position: 'relative', marginTop: 20,}}>
+        <View style={{position: 'relative', marginTop: 30,}}>
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={handleForgetPassword}>
