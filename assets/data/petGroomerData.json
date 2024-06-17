@@ -1,0 +1,32 @@
+[
+    {
+        "id": "1",
+        "title": "Signature Groomer",
+        "image": "image_1.png",
+        "desc1": "Professional Shampoo and Conditioner",
+        "desc2": "Haircut",
+        "desc3": "Ear and Eye Gentle Cleaning",
+        "desc4": "Spa and Massage Therapy",
+        "desc5": "Healthy Food and Vitamin Boost",
+        "desc6": "Health Care Check Up",
+        "desc7": "Play and Teaching Session"
+    },
+    {
+        "id": "2",
+        "title": "Complete Groomer",
+        "image": "image_2.png",
+        "desc1": "Quality Shampoo and Conditioner",
+        "desc2": "Haircut",
+        "desc3": "Ear and Eye Cleaning",
+        "desc4": "Spa and Massage Therapy",
+        "desc5": "Healthy Food and Vitamin Boost"
+    },
+    {
+        "id": "3",
+        "title": "Eco Groomer",
+        "image": "image_3.png",
+        "desc1": "Gentle Shampoo and Conditioner",
+        "desc2": "Haircut",
+        "desc3": "Ear and Eye Cleaning"
+    }
+]
