@@ -8,10 +8,10 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const Account = ({ navigation }: any) => {
   const [userData, setUserData] = useState({
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     email: '',
-    phoneNumber: '',
+    phone_number: '',
     address: '',
     password: '',
     confirmPassword: ''
@@ -24,15 +24,15 @@ const Account = ({ navigation }: any) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      try {
+      try { 
         const userDoc = await firestore().collection('user').doc(uid).get();
         const data = userDoc.data();
         if (data) {
           setUserData({
-            firstName: data.firstName || '',
-            lastName: data.lastName || '',
+            first_name: data.first_name || '',
+            last_name: data.last_name || '',
             email: data.email || '',
-            phoneNumber: data.phoneNumber || '',
+            phone_number: data.phone_number || '',
             address: data.address || '',
             password: '',
             confirmPassword: ''
@@ -93,14 +93,14 @@ const Account = ({ navigation }: any) => {
           <TextInput
             style={styles.input}
             placeholder="First Name"
-            value={userData.firstName}
+            value={userData.first_name}
             onChangeText={(text) => handleInputChange('firstName', text)}
           />
           <Text style={styles.input_title}>Last Name</Text>
           <TextInput
             style={styles.input}
             placeholder="Last Name"
-            value={userData.lastName}
+            value={userData.last_name}
             onChangeText={(text) => handleInputChange('lastName', text)}
           />
           <Text style={styles.input_title}>Email Address</Text>
@@ -115,7 +115,7 @@ const Account = ({ navigation }: any) => {
             style={styles.input}
             placeholder="Phone Number"
             keyboardType="numeric"
-            value={userData.phoneNumber}
+            value={userData.phone_number}
             onChangeText={(text) => handleInputChange('phoneNumber', text)}
           />
           <Text style={styles.input_title}>Address</Text>
