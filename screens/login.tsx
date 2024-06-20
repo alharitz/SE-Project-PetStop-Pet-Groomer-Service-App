@@ -55,14 +55,14 @@ const LoginPage = ({navigation}: any) => {
         routes: [{ name: 'Index' }],
       });
     } catch (error:any) {
-      console.error(error);
+      // console.error(error);
       if (error.code === 'auth/invalid-credential') {
         setErrorMessage('Email or password incorrect!');
       } else if (error.code === 'auth/invalid-email') {
         setErrorMessage('Incorrect email format');
       } else {
         setErrorMessage("Login Error");
-        console.error("Login error:", error);
+        // console.error("Login error:", error);
      }
     }
   };
@@ -145,6 +145,7 @@ const LoginPage = ({navigation}: any) => {
           }}
           disabled={!isFieldsFilled()}
           onPress = {handleLoginButtonPress}
+          testID="Login"
         />
         <SafeAreaView style={{flexDirection:'row', marginTop: 30}} >
           <Text style={{fontSize: 16, color: 'black'}}>
