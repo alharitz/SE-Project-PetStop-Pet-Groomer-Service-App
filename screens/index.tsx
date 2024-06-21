@@ -64,7 +64,9 @@ const Index = () => {
           paddingBottom: 10, 
           paddingTop: 10, 
           borderTopWidth: 3,
+          borderBottomWidth: 4,
           borderTopColor: '#FA751C',
+          borderBottomColor: '#FA751C'
         },
       })}
     >

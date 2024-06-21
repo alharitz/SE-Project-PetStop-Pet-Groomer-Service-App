@@ -100,13 +100,14 @@ const ProfilePage = ({ navigation }:any) => {
       </View>
       <View style={{ marginHorizontal: 20 }}>
         <CustomProfileButton title={'Account'} icon={'account-outline'} onPress={() => { navigation.navigate('Account') }} />
-        <CustomProfileButton title={'Address'} icon={'home-outline'} onPress={() => { }} />
-        <CustomProfileButton title={'Notification'} icon={'bell-outline'} onPress={() => { }} />
-        <CustomProfileButton title={'History'} icon={'history'} onPress={() => { }} />
+        <CustomProfileButton title={'Address'} icon={'home-outline'} onPress={() => {navigation.navigate('Address')}} />
+        <CustomProfileButton title={'Notification'} icon={'bell-outline'} onPress={() => {navigation.navigate('Notification')}} />
+        <CustomProfileButton title={'History'} icon={'history'} onPress={() => {navigation.navigate('History')}} />
         <CustomProfileButton title={'Contact Us'} icon={'phone'} onPress={() => { }} />
       </View>
       <View style={style.logoutButtonContainer}>
         <CustomButton
+          testID={null}
           title="Log Out"
           buttonStyle={style.logoutButton}
           textStyle={style.logoutButtonText}

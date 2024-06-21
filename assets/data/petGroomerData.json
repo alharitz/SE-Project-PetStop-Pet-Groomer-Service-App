@@ -9,7 +9,8 @@
         "desc4": "Spa and Massage Therapy",
         "desc5": "Healthy Food and Vitamin Boost",
         "desc6": "Health Care Check Up",
-        "desc7": "Play and Teaching Session"
+        "desc7": "Play and Teaching Session",
+        "price": "Rp.750.000,00"
     },
     {
         "id": "2",
@@ -19,7 +20,8 @@
         "desc2": "Haircut",
         "desc3": "Ear and Eye Cleaning",
         "desc4": "Spa and Massage Therapy",
-        "desc5": "Healthy Food and Vitamin Boost"
+        "desc5": "Healthy Food and Vitamin Boost",
+        "price": "Rp.500.000,00"
     },
     {
         "id": "3",
@@ -27,6 +29,7 @@
         "image": "image_3.png",
         "desc1": "Gentle Shampoo and Conditioner",
         "desc2": "Haircut",
-        "desc3": "Ear and Eye Cleaning"
+        "desc3": "Ear and Eye Cleaning",
+        "price": "Rp.250.000,00"
     }
 ]

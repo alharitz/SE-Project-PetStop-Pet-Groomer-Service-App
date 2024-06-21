@@ -10,6 +10,7 @@ import LoadingPage from './screens/loading';
 import RegisterPage from './screens/register';
 import AccountPage from './screens/account';
 import PetGroomer from './screens/petGroomer';
+import AddressPage from './screens/address';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,17 +45,24 @@ const App = () => {
   }
 
   return (
-    // <PetGroomer/>
-    
+    // <AddressPage/>
+
     <NavigationContainer>
       {/* <Index/> */}
     {/* Cheking whether user data is stored (isLoggedIn) or not */}
-      <Stack.Navigator initialRouteName={isLoggedIn ? 'Index' : 'Login'}>
+      <Stack.Navigator initialRouteName={isLoggedIn ? 'Index' : 'Login'}
+      screenOptions={{
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}>
       {/* <Stack.Navigator initialRouteName='Index'> */}
         <Stack.Screen name='Login' component={LoginPage} options={{ headerShown: false }} />
         <Stack.Screen name='Register' component={RegisterPage} options={{ headerShown: false }} />
         <Stack.Screen name='Index' component={Index} options={{ headerShown: false }} />
         <Stack.Screen name ='Account' component={AccountPage} />
+        <Stack.Screen name ='Address' component={AddressPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

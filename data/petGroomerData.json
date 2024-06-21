@@ -1,0 +1,42 @@
+[
+    {
+      "id": "PG001",
+      "title": "Signature Groomer",
+      "image": "image_1.png",
+      "desc": [
+        "Professional Shampoo and Conditioner",
+        "Haircut",
+        "Ear and Eye Gentle Cleaning",
+        "Spa and Massage Therapy",
+        "Healthy Food and Vitamin Boost",
+        "Health Care Check Up",
+        "Play and Teaching Session"
+      ],
+      "price": "Rp.750.000,00"
+    },
+    {
+      "id": "PG002",
+      "title": "Complete Groomer",
+      "image": "image_2.png",
+      "desc": [
+        "Quality Shampoo and Conditioner",
+        "Haircut",
+        "Ear and Eye Cleaning",
+        "Spa and Massage Therapy",
+        "Healthy Food and Vitamin Boost"
+      ],
+      "price": "Rp.500.000,00"
+    },
+    {
+      "id": "PG003",
+      "title": "Eco Groomer",
+      "image": "image_3.png",
+      "desc": [
+        "Gentle Shampoo and Conditioner",
+        "Haircut",
+        "Ear and Eye Cleaning"
+      ],
+      "price": "Rp.250.000,00"
+    }
+  ]
+  

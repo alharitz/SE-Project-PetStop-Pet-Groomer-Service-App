@@ -1,33 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Dimensions, Image, TextInput } from 'react-native';
-
-// Import data
-import groomingData from '../assets/data/petGroomerData.json'; // Adjust the path according to your project structure
+import { View, Text, StyleSheet, FlatList, ScrollView, Dimensions, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 import CustomButton from '../assets/properties/CustomButton';
+import { Picker } from '@react-native-picker/picker';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import LoadingPage from './loading';
 
 // Define type for data item
 type Item = {
   id: string;
   title: string;
   image: string;
-  desc1: string;
-  desc2: string;
-  desc3: string;
-  desc4?: string;
-  desc5?: string;
-  desc6?: string;
-  desc7?: string;
+  desc: string[];
+  price: string;
 };
 
 const screenWidth = Dimensions.get("window").width;
 
-const PetGroomer = () => {
+const PetGroomer = ({ navigation }: any) => {
   const [listData, setListData] = useState<Item[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [selectedDeliveryOption, setSelectedDeliveryOption] = useState('');
+  const [selectedAddress, setSelectedAddress] = useState('');
+  const [selectedPetType, setSelectedPetType] = useState('');
+  const [isOtherPetType, setIsOtherPetType] = useState(false);
+  const [notes, setNotes] = useState('');
+  const [showPayment, setShowPayment] = useState(false);
 
   useEffect(() => {
-    // Import data from JSON
-    setListData(groomingData);
+    // Fetch data from Firestore
+    const fetchData = async () => {
+      try {
+        const groomingCollection = await firestore().collection('petGroomer').get();
+        const groomingData = groomingCollection.docs.map(doc => doc.data()) as Item[];
+        setListData(groomingData);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data from Firestore: ', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const getImage = (imageName: string) => {
@@ -43,69 +58,83 @@ const PetGroomer = () => {
     }
   };
 
-  const renderItem = ({ item }: {item: Item}) => (
+  const renderItem = ({ item }: { item: Item }) => (
     <View style={styles.flatlist_container}>
       <Image source={getImage(item.image)} style={styles.flatlist_image} resizeMode="contain" />
       <Text style={styles.flatlist_title}>{item.title}</Text>
       <Text style={styles.flatlist_desc}>
-        {item.desc1}{"\n"}{"\n"}
-        {item.desc2}{"\n"}{"\n"}
-        {item.desc3}{"\n"}{"\n"}
-        {item.desc4}{"\n"}{"\n"}
-        {item.desc5}{"\n"}{"\n"}
-        {item.desc6}{"\n"}{"\n"}
-        {item.desc7}
+        {item.desc.map((desc, index) => (
+          <React.Fragment key={index}>
+            {desc}{"\n"}{"\n"}
+          </React.Fragment>
+        ))}
+      </Text>
+      <Text style={styles.flatlist_title}>
+        {item.price}
       </Text>
     </View>
   );
 
-  const renderDotIndicator = (listData.map((Dot, Index) =>
-  Index === activeIndex ? 
-  (
-    <View 
-      key={Index}
-      style={{
-        backgroundColor: '#ed9121',
-        height: 10,
-        width: 40,
-        borderRadius: 5,
-        marginHorizontal: 7,
-        marginTop: 30,
-    }}>
-    </View>
-  ) 
-  :
-  (
-    <View 
-      key={Index}
-      style={{
-        backgroundColor: 'grey',
-        height: 10,
-        width: 10,
-        borderRadius: 5,
-        marginHorizontal: 7,
-        marginTop: 30,
-    }}>
-    </View>
-  )
-)
-);
-
-  // BACK END FUNCTION
-  const [petType, onChangePetType] = useState("");
-  const [notes, onChangeNotes] = useState("");
+  const renderDotIndicator = listData.map((Dot, Index) =>
+    Index === activeIndex ?
+      (
+        <View
+          key={Index}
+          style={{
+            backgroundColor: '#ed9121',
+            height: 10,
+            width: 40,
+            borderRadius: 5,
+            marginHorizontal: 7,
+            marginTop: 30,
+          }}>
+        </View>
+      )
+      :
+      (
+        <View
+          key={Index}
+          style={{
+            backgroundColor: 'grey',
+            height: 10,
+            width: 10,
+            borderRadius: 5,
+            marginHorizontal: 7,
+            marginTop: 30,
+          }}>
+        </View>
+      )
+  );
 
   const handlePayment = () => {
-    if (petType.length > 0) {
+    if (selectedPetType.length > 0) {
       console.log("Active");
-      // Add navigation logic or payment processing logic here
-      // ambil optionnya pake active index
       console.log(activeIndex);
-      
+      Alert.alert(`Thank you for your transaction, please wait for our admin to confirm the payment`);
     } else {
       console.log("Pet Type is required");
     }
   }
+
+  const handleUploadPaymentProof = () => {
+    console.log('Active');
+  }
+
+  const handleContinueToPayment = () => {
+    if (selectedPetType.length > 0 && selectedDeliveryOption.length > 0 && selectedAddress.length > 0) {
+      setShowPayment(true);
+    } else {
+      Alert.alert('Please select all options before continuing to payment');
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <LoadingPage />
+    );
+  }
+
+  const selectedService = listData[activeIndex];
 
   return (
     <ScrollView
@@ -120,45 +149,112 @@ const PetGroomer = () => {
           keyExtractor={(item) => item.id}
           horizontal
           pagingEnabled
-          showsHorizontalScrollIndicator= {false}
-          nestedScrollEnabled  // Enable nested scrolling for FlatList
-          onScroll={(event) =>{setActiveIndex(Math.round(event.nativeEvent.contentOffset.x / screenWidth))}}
+          showsHorizontalScrollIndicator={false}
+          nestedScrollEnabled
+          onScroll={(event) => { setActiveIndex(Math.round(event.nativeEvent.contentOffset.x / screenWidth)) }}
         />
       </View>
 
-      <View style={{flexDirection: 'row', justifyContent: 'center',}}>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', }}>
         {renderDotIndicator}
       </View>
 
       <View style={styles.formContainer}>
         <Text style={styles.subtitle}>Address</Text>
-        <View style={styles.addressContainer}>
-          <Text style={styles.address}>Lorem ipsum dolor sit amet</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedAddress}
+            onValueChange={(itemValue) => { setSelectedAddress(itemValue) }}
+            style={styles.picker}
+          >
+            <Picker.Item label='Select Address' value='' />
+            <Picker.Item label='123 Main St, Cityville' value='123 Main St, Cityville' />
+            <Picker.Item label='456 Side St, Townsville' value='456 Side St, Townsville' />
+            <Picker.Item label='789 High St, Villageton' value='789 High St, Villageton' />
+          </Picker>
         </View>
         <Text style={styles.subtitle}>Pet Type</Text>
-        <TextInput
-          style={styles.form}
-          onChangeText={onChangePetType}
-          value={petType}
-          placeholder="Your Pet"
-        />
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedPetType}
+            onValueChange={(itemValue) => {
+              setSelectedPetType(itemValue);
+              setIsOtherPetType(itemValue === 'Other');
+            }}
+            style={styles.picker}
+          >
+            <Picker.Item label='Select Pet Type' value='' />
+            <Picker.Item label='Cat' value='Cat' />
+            <Picker.Item label='Dog' value='Dog' />
+            <Picker.Item label='Bird' value='Bird' />
+            <Picker.Item label='Rabbit' value='Rabbit' />
+            <Picker.Item label='Fish' value='Fish' />
+            <Picker.Item label='Reptile' value='Reptile' />
+            <Picker.Item label='Other' value='Other' />
+          </Picker>
+        </View>
+        {isOtherPetType && (
+          <TextInput
+            style={styles.form}
+            onChangeText={setSelectedPetType}
+            value={selectedPetType}
+            placeholder="Pet Type"
+          />
+        )}
+        <Text style={styles.subtitle}>Delivery Options</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedDeliveryOption}
+            onValueChange={(itemValue) => { setSelectedDeliveryOption(itemValue) }}
+            style={styles.picker}
+          >
+            <Picker.Item label='Select Options' value='' />
+            <Picker.Item label='Picked Up and Drop Off' value='Picked Up and Drop Off' />
+            <Picker.Item label='Deliver by Yourself' value='Deliver by Yourself' />
+            <Picker.Item label='Picked Up' value='Picked Up' />
+            <Picker.Item label='Drop Off' value='Drop Off' />
+          </Picker>
+        </View>
         <Text style={styles.subtitle}>Notes</Text>
         <TextInput
           style={styles.form}
-          onChangeText={onChangeNotes}
+          onChangeText={setNotes}
           value={notes}
           placeholder="Notes"
         />
       </View>
-      <View style={styles.buttonContainer}>
+
+      {!showPayment ? (
         <CustomButton
-          disabled={petType.length === 0} // Disable button if petType is empty
-          onPress={handlePayment}
+          // disabled={selectedPetType.length === 0 || selectedDeliveryOption.length === 0 || selectedAddress.length === 0}
+          disabled={false}
+          onPress={handleContinueToPayment}
           buttonStyle={styles.button_style}
           textStyle={styles.button_text_style}
           title={"Continue to Payment"}
         />
-      </View>
+      ) : (
+        <View style={styles.formContainer}>
+          <Text style={styles.subtitle}>Payment</Text>
+          <Text style={styles.banckAccount}>222-425-444-1200</Text>
+          <Text style={{ color: '#6c757d', fontSize: 18, fontWeight: '700', marginTop: 10 }}>Pet Stop Corp</Text>
+          <Text style={styles.subtitle}>Total Price: {selectedService?.price}</Text>
+          <TouchableOpacity
+            style={styles.uploadPaymentProofButton}
+            activeOpacity={0.7}
+            onPress={handleUploadPaymentProof}>
+            <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginTop: 10 }}>Upload Proof of Payment</Text>
+            <MaterialCommunityIcons name='image-plus' size={25} color={'white'} style={{ marginTop: 10, marginLeft: 12 }} />
+          </TouchableOpacity>
+          <CustomButton
+            disabled={false}
+            onPress={handlePayment}
+            buttonStyle={styles.button_style}
+            textStyle={styles.button_text_style}
+            title={"Confirm Payment"}
+          />
+        </View>
+      )}
     </ScrollView>
   );
 };
@@ -178,19 +274,18 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 26,
     fontWeight: '700',
-    marginBottom: 10,
   },
   flatlist_image: {
     height: 320,
     alignSelf: 'center',
   },
   flatlist_desc: {
-    marginTop: 10,
     fontSize: 16,
     color: '#343a40',
     fontWeight: '400',
   },
   button_style: {
+    marginBottom: 30,
     width: 300,
     height: 60,
     borderRadius: 40,
@@ -219,27 +314,41 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 10,
   },
-  addressContainer: {
-    padding: 15,
-    fontSize: 16,
-    borderWidth: 1.5,
-    height: 120,
-    width: 335,
-    marginTop: 10,
+  pickerContainer: {
     borderRadius: 20,
-    paddingHorizontal: 20,
-    borderColor: "#ed9121",
+    borderColor: '#ed9121',
+    borderWidth: 1.5,
+    marginTop: 10,
+    overflow: 'hidden', // This is necessary for the border radius to take effect
   },
-  address: {
-    fontSize: 16,
-    color: '#343a40',
-    fontWeight: '400',
+  picker: {
+    width: '100%',
+    height: 60,
+  },
+  banckAccount: {
+    color: '#FA751C',
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 10,
+  },
+  uploadPaymentProofButton: {
+    elevation: 5,
+    marginTop: 20,
+    alignSelf: 'center',
+    paddingTop: 9,
+    paddingBottom: 20,
+    paddingHorizontal: 28,
+    width: '100%',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: '#ed9121',
+    borderRadius: 40
   },
   buttonContainer: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 15,
   },
 });
 

@@ -12,8 +12,7 @@ const CustomButton = ({disabled, onPress, title, buttonStyle, textStyle}) => {
       onPress={onPress}
       activeOpacity={0.7}
       disabled={disabled}
-      // testID='Login'
-    >
+      testID='Login'>
       <Text style={[styles.custom_button_text, textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
