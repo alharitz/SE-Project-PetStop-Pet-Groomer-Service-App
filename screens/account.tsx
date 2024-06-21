@@ -5,6 +5,9 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import CustomButton from '../assets/properties/CustomButton';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { launchImageLibrary } from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage'
+
 
 const Account = ({ navigation }: any) => {
   const [userData, setUserData] = useState({
@@ -14,7 +17,6 @@ const Account = ({ navigation }: any) => {
     phone_number: '',
     address: '',
     password: '',
-    confirmPassword: ''
   });
 
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
@@ -35,7 +37,6 @@ const Account = ({ navigation }: any) => {
             phone_number: data.phone_number || '',
             address: data.address || '',
             password: '',
-            confirmPassword: ''
           });
         }
       } catch (error) {
@@ -51,12 +52,53 @@ const Account = ({ navigation }: any) => {
     setIsSaveEnabled(allFieldsFilled);
   }, [userData]);
 
-  const handleUploadImage = () => {
-    // Handle image upload
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(null);
+  const [transferred, setTransferred] = useState(0);
+
+  const pickImage = () => {
+    //pick image from gallery
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 1,
+        maxWidth: 300,
+        maxHeight: 300,
+      },
+      (response) => {
+        if(response.didCancel){
+          console.log('User cancelled image picker');
+        } else if(response.errorCode){
+          console.log('ImagePIcker Error: ', response.errorMessage);
+        } else {
+          setImageUri(response.assets[0].uri);
+        }
+      }
+    );
   };
 
   const handleSave = async () => {
     try {
+      //upload image to storage
+      if (imageUri == null){
+        return;
+      }
+      const uploadUri = imageUri;
+      const storageRef = storage().ref(uid);
+
+      const uploadTask = storageRef.putFile(imageUri);
+  
+      uploadTask.on('state_changed', (taskSnapshot) => {
+        console.log('${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}')
+      });
+  
+      uploadTask.then(() => {
+        console.log('Image uploaded to the bucket!');
+      }).catch((error) => {
+        console.log('Image Upload Error', error);
+      });
+      
+      //save data
       await firestore().collection('user').doc(uid).update(userData);
       navigation.goBack();
     } catch (error) {
@@ -71,20 +113,22 @@ const Account = ({ navigation }: any) => {
     setUserData(prevData => ({ ...prevData, [field]: value }));
   };
 
+  const defaultImage = require('./images/logoFix.png');
+
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ScrollView keyboardShouldPersistTaps="handled">
         <View style={styles.edit_profile_pict_container}>
           <View style={{ alignItems: 'center' }}>
-            <Image
-              source={require('./images/logoFix.png')}
-              style={styles.profile_pict}
-            />
+            <Image 
+              source= {imageUri ? { uri : imageUri } : defaultImage} 
+              style ={styles.profile_pict}
+             />
           </View>
           <TouchableOpacity
             style={[styles.upload_button]}
             activeOpacity={0.7}
-            onPress={handleUploadImage}>
+            onPress={pickImage}>
             <MaterialCommunityIcons name='image-plus' size={30} color={'#FA751C'} />
           </TouchableOpacity>
         </View>
@@ -94,14 +138,14 @@ const Account = ({ navigation }: any) => {
             style={styles.input}
             placeholder="First Name"
             value={userData.first_name}
-            onChangeText={(text) => handleInputChange('firstName', text)}
+            onChangeText={(text) => handleInputChange('first_name', text)}
           />
           <Text style={styles.input_title}>Last Name</Text>
           <TextInput
             style={styles.input}
             placeholder="Last Name"
             value={userData.last_name}
-            onChangeText={(text) => handleInputChange('lastName', text)}
+            onChangeText={(text) => handleInputChange('last_name', text)}
           />
           <Text style={styles.input_title}>Email Address</Text>
           <TextInput
@@ -116,7 +160,7 @@ const Account = ({ navigation }: any) => {
             placeholder="Phone Number"
             keyboardType="numeric"
             value={userData.phone_number}
-            onChangeText={(text) => handleInputChange('phoneNumber', text)}
+            onChangeText={(text) => handleInputChange('phone_number', text)}
           />
           <Text style={styles.input_title}>Address</Text>
           <TextInput
@@ -133,14 +177,7 @@ const Account = ({ navigation }: any) => {
             value={userData.password}
             onChangeText={(text) => handleInputChange('password', text)}
           />
-          <Text style={styles.input_title}>Confirm Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            secureTextEntry
-            value={userData.confirmPassword}
-            onChangeText={(text) => handleInputChange('confirmPassword', text)}
-          />
+          
         </View>
         <View style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
           <CustomButton
@@ -149,7 +186,6 @@ const Account = ({ navigation }: any) => {
             buttonStyle={[styles.button, { backgroundColor: isSaveEnabled ? '#FA751C' : '#cccccc' }]}
             textStyle={styles.buttonText}
             onPress={handleSave}
-            testID={Login}
           />
         </View>
       </ScrollView>
@@ -167,6 +203,7 @@ const styles = StyleSheet.create({
   profile_pict: {
     width: 160,
     height: 160,
+    borderRadius: 100,
   },
   upload_button: {
     position: 'absolute',

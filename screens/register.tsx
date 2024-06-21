@@ -71,7 +71,10 @@ const RegisterPage = ({ navigation }:any) => {
               first_name: firstName,
               last_name: lastName,
               email,
+              password,
               phone_number: phoneNumber,
+              address: '',
+              profileRef: uid,
             });
 
             navigation.navigate('Login');

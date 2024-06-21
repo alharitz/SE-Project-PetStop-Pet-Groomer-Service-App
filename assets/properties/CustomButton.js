@@ -5,14 +5,15 @@ import {
   StyleSheet,
 } from 'react-native';
 
-const CustomButton = ({disabled, onPress, title, buttonStyle, textStyle, testID}) => {
+const CustomButton = ({disabled, onPress, title, buttonStyle, textStyle}) => {
   return (
     <TouchableOpacity
       style={[styles.custom_button,styles.elevation, buttonStyle, disabled && styles.disabled_button]}
       onPress={onPress}
       activeOpacity={0.7}
       disabled={disabled}
-      testID='Login'>
+      // testID='Login'
+    >
       <Text style={[styles.custom_button_text, textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
