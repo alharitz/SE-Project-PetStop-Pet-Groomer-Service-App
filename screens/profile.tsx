@@ -35,7 +35,7 @@ const ProfilePage = ({ navigation }:any) => {
 
       //fetching profile pic
       try{
-        const url = await storage().ref(uid).getDownloadURL();
+        const url = await storage().ref('/images/'+uid).getDownloadURL();
         if(url){
           setImageUri(url);
         }

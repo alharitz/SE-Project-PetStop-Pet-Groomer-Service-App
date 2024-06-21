@@ -6,6 +6,14 @@ import { Picker } from '@react-native-picker/picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LoadingPage from './loading';
 import CustomButton from '../assets/properties/CustomButton';
+import { launchImageLibrary } from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+import collection from '@react-native-firebase/firestore';
+import query from '@react-native-firebase/firestore';
+import orderBy from '@react-native-firebase/firestore';
+import limit from '@react-native-firebase/firestore';
+import getDocs from '@react-native-firebase/firestore';
+import addDoc from '@react-native-firebase/firestore';
 
 // Define type for data item
 type Item = {
@@ -30,6 +38,7 @@ const PetGroomer = ({ navigation }: any) => {
   const [notes, setNotes] = useState('');
   const [showPayment, setShowPayment] = useState(false);
   const [addressOptions, setAddressOptions] = useState<string[]>([]); // State untuk menyimpan opsi alamat dari Firestore
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch data from Firestore
@@ -126,18 +135,65 @@ const PetGroomer = ({ navigation }: any) => {
         </View>
       )
   );
-
+  
+  
   const handlePayment = () => {
     if (selectedPetType.length > 0) {
       console.log("Active");
       console.log(activeIndex);
+      const user = auth().currentUser;
+      if(user){
+        const uid = user.uid;
+        
+        if(imageUri == null){
+          return;
+        }
+
+        const uploadUri = imageUri;
+        const storageRef = storage().ref('/payment/'+uid);
+        const uploadTask = storageRef.putFile(uploadUri);
+
+        uploadTask.on('state_changed', (taskSnapshot) => {
+          console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+        });
+    
+        uploadTask.then(() => {
+          console.log('Image uploaded to the bucket!');
+        }).catch((error) => {
+          console.log('Image Upload Error', error);
+        });
+      }
+       
       Alert.alert(`Thank you for your transaction, please wait for our admin to confirm the payment`);
     } else {
       console.log("Pet Type is required");
     }
   }
 
-  const handleUploadPaymentProof = () => {
+  const handleUploadPaymentProof = async () => {
+    //pick image from gallery
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 1,
+      },
+      (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.errorCode) {
+          console.log('ImagePIcker Error: ', response.errorMessage);
+        } else {
+          if (response.assets && response.assets.length > 0) {
+            const uri = response.assets[0]?.uri;
+            if (uri) {
+              setImageUri(uri);
+            }
+          }
+        }
+      }
+    );  
+  
+    
     console.log('Active');
   }
 
