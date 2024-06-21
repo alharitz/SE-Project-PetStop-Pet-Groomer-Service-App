@@ -28,7 +28,9 @@ const Account = ({ navigation }: any) => {
   const uid = user?.uid;
 
   useEffect(() => {
-    //setting profile picture from database if available
+    if(user){
+      fetchProfilePicture(uid);
+    }
     
     const fetchUserData = async () => {
       try { 
@@ -51,6 +53,18 @@ const Account = ({ navigation }: any) => {
 
     fetchUserData();
   }, [uid]);
+
+  const fetchProfilePicture = async () => {
+    //fetching profile pic
+    try{
+      const url = await storage().ref(uid).getDownloadURL();
+      if(url){
+        setImageUri(url);
+      }
+    } catch (error){
+      console.log('Error fetching profile picture');
+    }
+  }
 
   useEffect(() => {
     const allFieldsFilled = Object.values(userData).every(field => field !== '');
