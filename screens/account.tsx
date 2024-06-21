@@ -9,7 +9,6 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage'
 import ref from '@react-native-firebase/storage'
 import getDownloadURL from '@react-native-firebase/storage';
-import RNFetchBlob from 'rn-fetch-blob';
 
 const Account = ({ navigation }: any) => {
   const [userData, setUserData] = useState({
@@ -57,7 +56,7 @@ const Account = ({ navigation }: any) => {
   const fetchProfilePicture = async () => {
     //fetching profile pic
     try{
-      const url = await storage().ref(uid).getDownloadURL();
+      const url = await storage().ref('/images/'+uid).getDownloadURL();
       if(url){
         setImageUri(url);
       }
@@ -99,7 +98,7 @@ const Account = ({ navigation }: any) => {
         return;
       }
       const uploadUri = imageUri;
-      const storageRef = storage().ref(uid);
+      const storageRef = storage().ref('/images/'+uid);
 
       const uploadTask = storageRef.putFile(imageUri);
   
@@ -127,8 +126,6 @@ const Account = ({ navigation }: any) => {
     }
     setUserData(prevData => ({ ...prevData, [field]: value }));
   };
-
-  
   
   const defaultImage = require('./images/logoFix.png');
 

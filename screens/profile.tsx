@@ -27,20 +27,19 @@ const ProfilePage = ({ navigation }:any) => {
   useEffect(() => {
     fetchUserData();
   }, []);
+  
 
   const fetchUserData = async () => {
     const user = auth().currentUser;
     if (user) {
       const uid = user.uid;
-
-      //fetching profile pic
       try{
-        const url = await storage().ref(uid).getDownloadURL();
+        const url = await storage().ref('/images/'+uid).getDownloadURL();
         if(url){
           setImageUri(url);
-        }
-      } catch (error){
-        console.log('Error fetching profile picture');
+        } 
+      }catch (error){
+        console.log('Error fetching profile picture')
       }
 
       try {

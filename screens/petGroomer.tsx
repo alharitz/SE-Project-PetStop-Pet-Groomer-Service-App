@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, Dimensions, Image, TextInput } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage'
+import ref from '@react-native-firebase/storage'
+import getDownloadURL from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 // Import data
 import groomingData from '../assets/data/petGroomerData.json'; // Adjust the path according to your project structure
@@ -58,6 +64,50 @@ const PetGroomer = () => {
       </Text>
     </View>
   );
+
+  //buat upload image payment
+  const [imageUri, setImageUri] = useState(null);
+  const user = auth().currentUser;
+  const uid = user?.uid;
+
+  //1. pick image dari library
+  const pickImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 1,
+      },
+    (response) => {
+      if(response.didCancel){
+        console.log('User cancelled image picker');
+      } else if(response.errorCode){
+        console.log('ImagePicker Error: ', response.errorMessage);
+      } else {
+        setImageUri(response.assets[0].uri);
+      }
+    });
+  };
+
+  //2. upload image to storage
+  const handleSaveImage = async () => {
+    if(imageUri == null){
+      return;
+    }
+    const uploadUri = imageUri;
+    const storageRef = storage().ref('/payment/'+uid);
+    const uploadTask = storageRef.putFile(imageUri);
+  
+    uploadTask.on('state_changed', (taskSnapshot) => {
+      console.log('${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}')
+    });
+  
+    uploadTask.then(() => {
+      console.log('Image uploaded to the bucket!');
+    }).catch((error) => {
+      console.log('Image Upload Error', error);
+    });
+  }
+  
 
   const renderDotIndicator = (listData.map((Dot, Index) =>
   Index === activeIndex ? 
