@@ -53,7 +53,7 @@ const Account = ({ navigation }: any) => {
   const fetchProfilePicture = async (uid?: string | undefined) => {
     //fetching profile pic
     try{
-      const url = await storage().ref(uid).getDownloadURL();
+      const url = await storage().ref('/images/'+uid).getDownloadURL();
       if(url){
         setImageUri(url);
       }
@@ -100,7 +100,7 @@ const Account = ({ navigation }: any) => {
         return;
       }
       const uploadUri = imageUri;
-      const storageRef = storage().ref(uid);
+      const storageRef = storage().ref('/images/'+uid);
 
       const uploadTask = storageRef.putFile(uploadUri);
   
