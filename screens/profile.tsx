@@ -21,7 +21,7 @@ const ProfilePage = ({ navigation }:any) => {
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
   const [downloadUrl, setDownloadUrl] = useState(null);
-  const [imageUri, setImageUri] = useState(null);
+  const [imageUri, setImageUri] = useState('');
   const defaultImage = require('./images/logoFix.png');
 
   useEffect(() => {
@@ -107,7 +107,6 @@ const ProfilePage = ({ navigation }:any) => {
       </View>
       <View style={style.logoutButtonContainer}>
         <CustomButton
-          testID={null}
           title="Log Out"
           buttonStyle={style.logoutButton}
           textStyle={style.logoutButtonText}

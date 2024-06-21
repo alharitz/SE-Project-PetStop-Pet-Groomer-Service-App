@@ -1,45 +1,86 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, ScrollView } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const AddressPage = ({ navigation }:any) => {
+interface Address {
+    id: string;
+    name: string;
+    address: string; // Ubah tipe sesuai dengan data yang sebenarnya
+}
+
+const AddressPage = ({ navigation }: any) => {
+    const [addresses, setAddresses] = useState<Address[]>([]); // Tentukan tipe data untuk addresses
+
+    useEffect(() => {
+        const unsubscribe = firestore().collection('user').doc(auth().currentUser?.uid)
+            .onSnapshot((documentSnapshot) => {
+                const userData = documentSnapshot.data();
+                if (userData && userData.addresses) {
+                    const addressesArray: Address[] = Object.entries(userData.addresses).map(([name, address]) => ({
+                        id: name, // Assuming address name as unique identifier
+                        name,
+                        address: address as string, // Cast address to string if necessary
+                    }));
+                    setAddresses(addressesArray);
+                } else {
+                    setAddresses([]);
+                }
+            });
+
+        return () => unsubscribe();
+    }, []);
+
     const handleAddingAddress = () => {
-        // Implementasi penambahan alamat baru
+        navigation.navigate('AddAddress'); // Navigasi ke halaman tambah alamat
     };
 
-    const handleEditAddress = () => {
-        // Implementasi pengeditan alamat
+    const handleEditAddress = (id: string) => {
+        navigation.navigate('EditAddress', { addressId: id }); // Navigasi ke halaman edit alamat dengan id alamat
     };
 
-    const handleDeleteAddress = () => {
-        // Implementasi penghapusan alamat
+    const handleDeleteAddress = async (id: string) => {
+        if (addresses.length === 1) {
+            Alert.alert('Cannot Delete', 'You cannot delete the only address.', [{ text: 'OK' }]);
+            return;
+        }
+
+        try {
+            await firestore().collection('user').doc(auth().currentUser?.uid).update({
+                [`addresses.${id}`]: firestore.FieldValue.delete(),
+            });
+            console.log('Address deleted successfully');
+        } catch (error) {
+            console.error('Error deleting address: ', error);
+        }
     };
 
     return (
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.page}>
-            <View style={styles.addressContainer}>
-                <View style={styles.mainAddressContainer}>
-                    <Text style={styles.subtitle}>Main Address</Text>
-                    <Text style={styles.addres}>st. lorem ipsum dolor sit amet</Text>
+            {addresses.map((item) => (
+                <View key={item.id} style={styles.addressContainer}>
+                    <View style={styles.mainAddressContainer}>
+                        <Text style={styles.subtitle}>{item.name}</Text>
+                        <Text style={styles.address}>{item.address}</Text>
+                    </View>
+                    <View style={styles.iconContainer}>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => handleEditAddress(item.id)}
+                            style={styles.editButton}>
+                            <MaterialCommunityIcons name='pencil' size={20} color={'white'} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => handleDeleteAddress(item.id)}
+                            style={styles.deleteButton}>
+                            <MaterialCommunityIcons name='delete' size={20} color={'white'} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={styles.iconContainer}>
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={handleEditAddress}
-                        style={styles.editButton}>
-                        <MaterialCommunityIcons name='pencil' size={20} color={'white'} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={handleDeleteAddress}
-                        style={styles.deleteButton}>
-                        <MaterialCommunityIcons name='delete' size={20} color={'white'} />
-                    </TouchableOpacity>
-                </View>
-            </View>
+            ))}
             <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={handleAddingAddress}
@@ -68,17 +109,18 @@ const styles = StyleSheet.create({
         borderRadius: 27,
         borderColor: '#FA751C',
         padding: 20,
-        height: 150,
+        minHeight: 150,
     },
     subtitle: {
         fontSize: 22,
         fontWeight: '700',
         color: 'black',
     },
-    addres: {
+    address: {
         fontSize: 16,
         color: '#343a40',
         fontWeight: '600',
+        marginTop: 10,
     },
     iconContainer: {
         flexDirection: 'column',

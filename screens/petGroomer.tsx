@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, Dimensions, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import CustomButton from '../assets/properties/CustomButton';
+import auth  from '@react-native-firebase/auth';
 import { Picker } from '@react-native-picker/picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import LoadingPage from './loading';
+import CustomButton from '../assets/properties/CustomButton';
 
 // Define type for data item
 type Item = {
@@ -28,6 +29,7 @@ const PetGroomer = ({ navigation }: any) => {
   const [isOtherPetType, setIsOtherPetType] = useState(false);
   const [notes, setNotes] = useState('');
   const [showPayment, setShowPayment] = useState(false);
+  const [addressOptions, setAddressOptions] = useState<string[]>([]); // State untuk menyimpan opsi alamat dari Firestore
 
   useEffect(() => {
     // Fetch data from Firestore
@@ -43,6 +45,25 @@ const PetGroomer = ({ navigation }: any) => {
     };
 
     fetchData();
+
+    // Fetch addresses from Firestore and set options for Picker
+    const fetchAddresses = async () => {
+      const user = auth().currentUser;
+      const Uid = user?.uid
+      try {
+        const documentSnapshot = await firestore().collection('user').doc(Uid).get(); // Ganti 'userId' dengan userID sesuai aplikasi Anda
+        const userData = documentSnapshot.data();
+        if (userData && userData.addresses) {
+          const addresses = Object.values(userData.addresses) as string[];
+          setAddressOptions(addresses);
+          setSelectedAddress(addresses[0]); // Set default selected address
+        }
+      } catch (error) {
+        console.error('Error fetching addresses: ', error);
+      }
+    };
+
+    fetchAddresses();
   }, []);
 
   const getImage = (imageName: string) => {
@@ -146,12 +167,12 @@ const PetGroomer = ({ navigation }: any) => {
         <FlatList
           data={listData}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item: any) => item.id}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           nestedScrollEnabled
-          onScroll={(event) => { setActiveIndex(Math.round(event.nativeEvent.contentOffset.x / screenWidth)) }}
+          onScroll={(event: any) => { setActiveIndex(Math.round(event.nativeEvent.contentOffset.x / screenWidth)) }}
         />
       </View>
 
@@ -164,20 +185,20 @@ const PetGroomer = ({ navigation }: any) => {
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedAddress}
-            onValueChange={(itemValue) => { setSelectedAddress(itemValue) }}
+            onValueChange={(itemValue: string) => { setSelectedAddress(itemValue) }}
             style={styles.picker}
           >
             <Picker.Item label='Select Address' value='' />
-            <Picker.Item label='123 Main St, Cityville' value='123 Main St, Cityville' />
-            <Picker.Item label='456 Side St, Townsville' value='456 Side St, Townsville' />
-            <Picker.Item label='789 High St, Villageton' value='789 High St, Villageton' />
+            {addressOptions.map((address, index) => (
+              <Picker.Item key={index} label={address} value={address} />
+            ))}
           </Picker>
         </View>
         <Text style={styles.subtitle}>Pet Type</Text>
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedPetType}
-            onValueChange={(itemValue) => {
+            onValueChange={(itemValue: string) => {
               setSelectedPetType(itemValue);
               setIsOtherPetType(itemValue === 'Other');
             }}
@@ -205,7 +226,7 @@ const PetGroomer = ({ navigation }: any) => {
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedDeliveryOption}
-            onValueChange={(itemValue) => { setSelectedDeliveryOption(itemValue) }}
+            onValueChange={(itemValue: string) => { setSelectedDeliveryOption(itemValue) }}
             style={styles.picker}
           >
             <Picker.Item label='Select Options' value='' />
@@ -226,7 +247,6 @@ const PetGroomer = ({ navigation }: any) => {
 
       {!showPayment ? (
         <CustomButton
-          // disabled={selectedPetType.length === 0 || selectedDeliveryOption.length === 0 || selectedAddress.length === 0}
           disabled={false}
           onPress={handleContinueToPayment}
           buttonStyle={styles.button_style}
@@ -243,7 +263,9 @@ const PetGroomer = ({ navigation }: any) => {
             style={styles.uploadPaymentProofButton}
             activeOpacity={0.7}
             onPress={handleUploadPaymentProof}>
-            <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginTop: 10 }}>Upload Proof of Payment</Text>
+            <Text style={{ color: 'white', fontSize: 18, fontWeight: '700', marginTop: 10 }}>Upload
+              Proof of Payment
+            </Text>
             <MaterialCommunityIcons name='image-plus' size={25} color={'white'} style={{ marginTop: 10, marginLeft: 12 }} />
           </TouchableOpacity>
           <CustomButton
@@ -345,10 +367,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#ed9121',
     borderRadius: 40
-  },
-  buttonContainer: {
-    alignItems: 'center',
-    marginBottom: 15,
   },
 });
 

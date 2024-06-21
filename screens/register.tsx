@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import CustomButton from '../assets/properties/CustomButton';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-const RegisterPage = ({ navigation }:any) => {
+const RegisterPage = ({ navigation }: any) => {
   const [email, onChangeEmail] = useState('');
   const [firstName, onChangeFirstName] = useState('');
   const [lastName, onChangeLastName] = useState('');
@@ -24,6 +24,8 @@ const RegisterPage = ({ navigation }:any) => {
   const [iconName, setIconName] = useState('eye');
   const [errorMessage, setErrorMessage] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [addressName, setAddressName] = useState('');
+  const [address, setAddress] = useState('');
   const [isSelected, setSelection] = useState(false);
 
   const toggleShowPassword = () => {
@@ -31,7 +33,7 @@ const RegisterPage = ({ navigation }:any) => {
     setIconName(iconName === 'eye' ? 'eye-off' : 'eye');
   };
 
-  const handlePhoneNumberChange = (text:string) => {
+  const handlePhoneNumberChange = (text: string) => {
     const formattedPhoneNumber = text.replace(/[^0-9]/g, '');
     setPhoneNumber(formattedPhoneNumber);
   };
@@ -43,6 +45,8 @@ const RegisterPage = ({ navigation }:any) => {
       email.trim() !== '' &&
       password.trim() !== '' &&
       confirmPassword.trim() !== '' &&
+      addressName.trim() !== '' &&
+      address.trim() !== '' &&
       phoneNumber.trim() !== '' &&
       isSelected
     );
@@ -50,49 +54,41 @@ const RegisterPage = ({ navigation }:any) => {
 
   const handleSubmit = async () => {
     try {
-      if (password != confirmPassword) {
-        setErrorMessage('Confirm Password not match!.');
-        console.log('password error');
-        return true;
+      if (password !== confirmPassword) {
+        setErrorMessage('Confirm Password does not match.');
+        return;
+      }
+
+      const querySnapshot = await firestore()
+        .collection('user')
+        .where('email', '==', email)
+        .get();
+
+      if (!querySnapshot.empty) {
+        setErrorMessage('Email already exists. Please use a different email.');
       } else {
-        const querySnapshot = await firestore()
-          .collection('user')
-          .where('email', '==', email)
-          .get();
+        const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+        const { uid } = userCredential.user;
 
-        if (!querySnapshot.empty) {
-          setErrorMessage('Email Already Exist, please use a different email.');
-        } else {
-          try {
-            const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-            const { uid } = userCredential.user;
+        const userData = {
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          password,
+          phone_number: phoneNumber,
+          profileRef: uid,
+          addresses: {
+            [addressName]: address,
+          },
+        };
 
-            await firestore().collection('user').doc(uid).set({
-              first_name: firstName,
-              last_name: lastName,
-              email,
-              password,
-              phone_number: phoneNumber,
-              address: '',
-              profileRef: uid,
-            });
+        await firestore().collection('user').doc(uid).set(userData);
 
-            navigation.navigate('Login');
-          } catch (error) {
-            if (error === 'auth/weak-password') {
-              setErrorMessage('Password atleast 6 characters!');
-            } else if (error=== 'auth/invalid-email') {
-              setErrorMessage('Invalid email address!');
-            } else {
-              console.error(error);
-              setErrorMessage('Error Saving Credential');
-            }
-          }
-        }
+        navigation.navigate('Login');
       }
     } catch (error) {
       console.error('Error handle submit: ', error);
-      return;
+      setErrorMessage('Error creating account. Please try again later.');
     }
   };
 
@@ -164,6 +160,19 @@ const RegisterPage = ({ navigation }:any) => {
           placeholder='Phone Number'
           onChangeText={handlePhoneNumberChange}
           value={phoneNumber}
+        />
+        <TextInput
+          style={styles.form}
+          placeholder='Address Name (e.g., Home, Office)'
+          onChangeText={setAddressName}
+          value={addressName}
+        />
+        <TextInput
+          multiline
+          style={[styles.form, { height: 100, paddingTop: 15, textAlignVertical: 'top' }]}
+          placeholder='Address'
+          onChangeText={setAddress}
+          value={address}
         />
       </View>
       <View style={styles.check_box_container}>

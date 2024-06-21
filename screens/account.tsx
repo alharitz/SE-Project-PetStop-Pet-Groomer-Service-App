@@ -6,9 +6,7 @@ import auth from '@react-native-firebase/auth';
 import CustomButton from '../assets/properties/CustomButton';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { launchImageLibrary } from 'react-native-image-picker';
-import storage from '@react-native-firebase/storage'
-import ref from '@react-native-firebase/storage'
-import getDownloadURL from '@react-native-firebase/storage';
+import storage from '@react-native-firebase/storage';
 import RNFetchBlob from 'rn-fetch-blob';
 
 const Account = ({ navigation }: any) => {
@@ -17,12 +15,11 @@ const Account = ({ navigation }: any) => {
     last_name: '',
     email: '',
     phone_number: '',
-    address: '',
     password: '',
   });
 
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
-  const [imageUri, setImageUri] = useState(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   const user = auth().currentUser;
   const uid = user?.uid;
@@ -42,7 +39,6 @@ const Account = ({ navigation }: any) => {
             last_name: data.last_name || '',
             email: data.email || '',
             phone_number: data.phone_number || '',
-            address: data.address || '',
             password: '',
           });
         }
@@ -54,7 +50,7 @@ const Account = ({ navigation }: any) => {
     fetchUserData();
   }, [uid]);
 
-  const fetchProfilePicture = async () => {
+  const fetchProfilePicture = async (uid?: string | undefined) => {
     //fetching profile pic
     try{
       const url = await storage().ref(uid).getDownloadURL();
@@ -81,12 +77,17 @@ const Account = ({ navigation }: any) => {
         maxHeight: 300,
       },
       (response) => {
-        if(response.didCancel){
+        if (response.didCancel) {
           console.log('User cancelled image picker');
-        } else if(response.errorCode){
+        } else if (response.errorCode) {
           console.log('ImagePIcker Error: ', response.errorMessage);
         } else {
-          setImageUri(response.assets[0].uri);
+          if (response.assets && response.assets.length > 0) {
+            const uri = response.assets[0]?.uri;
+            if (uri) {
+              setImageUri(uri);
+            }
+          }
         }
       }
     );
@@ -101,10 +102,10 @@ const Account = ({ navigation }: any) => {
       const uploadUri = imageUri;
       const storageRef = storage().ref(uid);
 
-      const uploadTask = storageRef.putFile(imageUri);
+      const uploadTask = storageRef.putFile(uploadUri);
   
       uploadTask.on('state_changed', (taskSnapshot) => {
-        console.log('${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}')
+        console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
       });
   
       uploadTask.then(() => {
@@ -128,8 +129,6 @@ const Account = ({ navigation }: any) => {
     setUserData(prevData => ({ ...prevData, [field]: value }));
   };
 
-  
-  
   const defaultImage = require('./images/logoFix.png');
 
   return (
@@ -138,8 +137,8 @@ const Account = ({ navigation }: any) => {
         <View style={styles.edit_profile_pict_container}>
           <View style={{ alignItems: 'center' }}>
             <Image 
-              source= {imageUri ? { uri : imageUri } : defaultImage} 
-              style ={styles.profile_pict}
+              source={imageUri ? { uri: imageUri } : defaultImage} 
+              style={styles.profile_pict}
              />
           </View>
           <TouchableOpacity
@@ -155,21 +154,21 @@ const Account = ({ navigation }: any) => {
             style={styles.input}
             placeholder="First Name"
             value={userData.first_name}
-            onChangeText={(text) => handleInputChange('first_name', text)}
+            onChangeText={(text: string) => handleInputChange('first_name', text)}
           />
           <Text style={styles.input_title}>Last Name</Text>
           <TextInput
             style={styles.input}
             placeholder="Last Name"
             value={userData.last_name}
-            onChangeText={(text) => handleInputChange('last_name', text)}
+            onChangeText={(text: string) => handleInputChange('last_name', text)}
           />
           <Text style={styles.input_title}>Email Address</Text>
           <TextInput
             style={styles.input}
             placeholder="Email Address"
             value={userData.email}
-            onChangeText={(text) => handleInputChange('email', text)}
+            onChangeText={(text: string) => handleInputChange('email', text)}
           />
           <Text style={styles.input_title}>Phone Number</Text>
           <TextInput
@@ -177,14 +176,7 @@ const Account = ({ navigation }: any) => {
             placeholder="Phone Number"
             keyboardType="numeric"
             value={userData.phone_number}
-            onChangeText={(text) => handleInputChange('phone_number', text)}
-          />
-          <Text style={styles.input_title}>Address</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Address"
-            value={userData.address}
-            onChangeText={(text) => handleInputChange('address', text)}
+            onChangeText={(text: string) => handleInputChange('phone_number', text)}
           />
           <Text style={styles.input_title}>Password</Text>
           <TextInput
@@ -192,9 +184,8 @@ const Account = ({ navigation }: any) => {
             placeholder="Password"
             secureTextEntry
             value={userData.password}
-            onChangeText={(text) => handleInputChange('password', text)}
+            onChangeText={(text: string) => handleInputChange('password', text)}
           />
-          
         </View>
         <View style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
           <CustomButton
