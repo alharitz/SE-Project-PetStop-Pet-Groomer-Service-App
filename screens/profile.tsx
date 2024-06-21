@@ -13,10 +13,16 @@ import auth from '@react-native-firebase/auth';
 import CustomButton from '../assets/properties/CustomButton';
 import CustomProfileButton from '../assets/properties/CustomProfileButton';
 import LoadingPage from './loading';
+import storage from '@react-native-firebase/storage'
+import ref from '@react-native-firebase/storage'
+import getDownloadURL from '@react-native-firebase/storage';
 
 const ProfilePage = ({ navigation }:any) => {
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [downloadUrl, setDownloadUrl] = useState(null);
+  const [imageUri, setImageUri] = useState(null);
+  const defaultImage = require('./images/logoFix.png');
 
   useEffect(() => {
     fetchUserData();
@@ -26,6 +32,17 @@ const ProfilePage = ({ navigation }:any) => {
     const user = auth().currentUser;
     if (user) {
       const uid = user.uid;
+
+      //fetching profile pic
+      try{
+        const url = await storage().ref(uid).getDownloadURL();
+        if(url){
+          setImageUri(url);
+        }
+      } catch (error){
+        console.log('Error fetching profile picture');
+      }
+
       try {
         const userDoc = await firestore()
           .collection('user')
@@ -75,7 +92,7 @@ const ProfilePage = ({ navigation }:any) => {
       <View style={{ alignItems: 'center', marginHorizontal: 20 }}>
         <View style={[style.profile_name_pict_container, style.elevation]}>
           <Image 
-            source={require('./images/logoFix.png')}
+            source={imageUri ? { uri: imageUri} : defaultImage}
             style={style.profile_pict} 
           />
           <Text style={style.tittle}>{userName}</Text>
@@ -119,6 +136,7 @@ const style = StyleSheet.create({
   profile_pict: {
     width: 100,
     height: 100,
+    borderRadius: 100,
   },
   tittle: {
     marginTop: 10,

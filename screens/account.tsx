@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, View, Text, Image, StyleSheet, ScrollView, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Alert, TouchableOpacity, View, Text, Image, StyleSheet, ScrollView, TextInput, KeyboardAvoidingView } from 'react-native';
 
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -7,7 +7,9 @@ import CustomButton from '../assets/properties/CustomButton';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage'
-
+import ref from '@react-native-firebase/storage'
+import getDownloadURL from '@react-native-firebase/storage';
+import RNFetchBlob from 'rn-fetch-blob';
 
 const Account = ({ navigation }: any) => {
   const [userData, setUserData] = useState({
@@ -20,11 +22,14 @@ const Account = ({ navigation }: any) => {
   });
 
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
+  const [imageUri, setImageUri] = useState(null);
 
   const user = auth().currentUser;
   const uid = user?.uid;
 
   useEffect(() => {
+    //setting profile picture from database if available
+    
     const fetchUserData = async () => {
       try { 
         const userDoc = await firestore().collection('user').doc(uid).get();
@@ -51,10 +56,6 @@ const Account = ({ navigation }: any) => {
     const allFieldsFilled = Object.values(userData).every(field => field !== '');
     setIsSaveEnabled(allFieldsFilled);
   }, [userData]);
-
-  const [imageUri, setImageUri] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(null);
-  const [transferred, setTransferred] = useState(0);
 
   const pickImage = () => {
     //pick image from gallery
@@ -113,6 +114,8 @@ const Account = ({ navigation }: any) => {
     setUserData(prevData => ({ ...prevData, [field]: value }));
   };
 
+  
+  
   const defaultImage = require('./images/logoFix.png');
 
   return (
