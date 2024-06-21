@@ -139,13 +139,13 @@ const PetGroomer = ({ navigation }: any) => {
   
   const handlePayment = () => {
     if (selectedPetType.length > 0) {
-      console.log("Active");
       console.log(activeIndex);
       const user = auth().currentUser;
       if(user){
         const uid = user.uid;
         
         if(imageUri == null){
+          Alert.alert("Please upload payment proof !");
           return;
         }
 
@@ -163,7 +163,7 @@ const PetGroomer = ({ navigation }: any) => {
           console.log('Image Upload Error', error);
         });
       }
-       
+      navigation.goBack()
       Alert.alert(`Thank you for your transaction, please wait for our admin to confirm the payment`);
     } else {
       console.log("Pet Type is required");
@@ -186,6 +186,7 @@ const PetGroomer = ({ navigation }: any) => {
           if (response.assets && response.assets.length > 0) {
             const uri = response.assets[0]?.uri;
             if (uri) {
+              Alert.alert('Pealse upload payment proof!')
               setImageUri(uri);
             }
           }
