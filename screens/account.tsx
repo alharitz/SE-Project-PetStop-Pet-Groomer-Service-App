@@ -59,6 +59,7 @@ const Account = ({ navigation }: any) => {
       }
     } catch (error){
       console.log('Error fetching profile picture');
+      return
     }
   }
 

@@ -5,7 +5,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 // screens
 import HistoryPage from "./history";
-import NotificationPage from "./notification";
+import ProgressPage from "./progress";
 import PetGroomer from "./petGroomer";
 import PetHotel from "./petHotel";
 import PetDoctor from "./petDoctor";
@@ -48,8 +48,8 @@ const Index = () => {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'History') {
             iconName = 'history';
-          } else if (route.name === 'Notification') {
-            iconName = focused ? 'bell' : 'bell-outline';
+          } else if (route.name === 'Progress') {
+            iconName = focused ? 'clipboard-list' : 'clipboard-list-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'account' : 'account-outline';
           }
@@ -72,7 +72,7 @@ const Index = () => {
     >
       <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
       <Tab.Screen name="History" component={HistoryPage} options={{ headerShown: false }} />
-      <Tab.Screen name="Notification" component={NotificationPage} options={{ headerShown: false }} />
+      <Tab.Screen name="Progress" component={ProgressPage} options={{ headerShown: false }} />
       <Tab.Screen name="Profile" component={ProfilePage} options={{ headerShown: false }} />
     </Tab.Navigator>
   );

@@ -135,23 +135,54 @@ const PetGroomer = ({ navigation }: any) => {
         </View>
       )
   );
+
+  const getCurrentDateTime = () => {
+    const currentDate = new Date();
   
+    const year = currentDate.getFullYear();
+    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // +1 karena bulan dimulai dari 0
+    const day = ('0' + currentDate.getDate()).slice(-2);
   
-  const handlePayment = () => {
+    const hours = ('0' + currentDate.getHours()).slice(-2);
+    const minutes = ('0' + currentDate.getMinutes()).slice(-2);
+    const seconds = ('0' + currentDate.getSeconds()).slice(-2);
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };  
+
+  const uploadTransactionData = async(Uid:string, currentDateTime: string, paymentProof:string) =>{
+    await firestore().collection('petGroomerTransaction').doc(`${currentDateTime} ${Uid}`).set(
+      {
+        Uid: Uid,
+        service: selectedService.title,
+        transactionDateTime: currentDateTime,
+        transactionProof: paymentProof,
+        address: selectedAddress,
+        petType: selectedPetType,
+        deliveryOption: selectedDeliveryOption,
+        notes: notes
+      }
+    )
+    await firestore().collection('petGroomerTransaction').doc('transactionStatus').set({
+      unConfirm: firestore.FieldValue.arrayUnion(`${currentDateTime} ${Uid}`)
+    }, { merge: true });  }
+  
+  const handlePayment = async() => {
     if (selectedPetType.length > 0) {
       console.log(activeIndex);
       const user = auth().currentUser;
       if(user){
         const uid = user.uid;
-        
         if(imageUri == null){
           Alert.alert("Please upload payment proof !");
           return;
         }
-
+        const currentDateTime = getCurrentDateTime();
+        const paymentProof = `payment/'${currentDateTime} ${uid}`;
         const uploadUri = imageUri;
-        const storageRef = storage().ref('/payment/'+uid);
+        const storageRef = storage().ref(paymentProof);
         const uploadTask = storageRef.putFile(uploadUri);
+        uploadTransactionData(uid, currentDateTime, paymentProof)
 
         uploadTask.on('state_changed', (taskSnapshot) => {
           console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
@@ -186,7 +217,7 @@ const PetGroomer = ({ navigation }: any) => {
           if (response.assets && response.assets.length > 0) {
             const uri = response.assets[0]?.uri;
             if (uri) {
-              Alert.alert('Pealse upload payment proof!')
+              Alert.alert('Payment proof successfully selected')
               setImageUri(uri);
             }
           }
