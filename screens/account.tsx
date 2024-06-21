@@ -22,28 +22,14 @@ const Account = ({ navigation }: any) => {
   });
 
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
+  const [imageUri, setImageUri] = useState(null);
 
   const user = auth().currentUser;
   const uid = user?.uid;
 
   useEffect(() => {
     //setting profile picture from database if available
-    const fetchProfile = async () => {
-      const [userID, setUserID] = useState(null);
-      const [downloadUrl, setDownloadUrl] = useState(null);
-      if(user){    
-        try{
-          const url = await storage().ref(uid).getDownloadURL();
-          if(url){
-            setImageUri(url);
-          } 
-        } catch (error){
-          console.log('Error fetching image');
-        }
-      } else {
-        console.log('No user signed in');
-      }
-    }
+    
     const fetchUserData = async () => {
       try { 
         const userDoc = await firestore().collection('user').doc(uid).get();
@@ -70,8 +56,6 @@ const Account = ({ navigation }: any) => {
     const allFieldsFilled = Object.values(userData).every(field => field !== '');
     setIsSaveEnabled(allFieldsFilled);
   }, [userData]);
-
-  
 
   const pickImage = () => {
     //pick image from gallery
