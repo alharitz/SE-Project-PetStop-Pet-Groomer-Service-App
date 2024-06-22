@@ -11,6 +11,7 @@ import RegisterPage from './screens/register';
 import AccountPage from './screens/account';
 import PetGroomer from './screens/petGroomer';
 import AddressPage from './screens/address';
+import ProgressPage from './screens/progress';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,7 +46,9 @@ const App = () => {
   }
 
   return (
-    // <AddressPage/>
+    // <NavigationContainer> 
+    //   <ProgressPage/>
+    // </NavigationContainer>
 
     <NavigationContainer>
       {/* <Index/> */}

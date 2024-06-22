@@ -14,12 +14,9 @@ const PetGroomer = () => {
     const [confirmStatus, setConfirmStatus] = useState(false);
     const [onProgressStatus, setOnProgressStatus] = useState(false);
     const [completedStatus, setCompletedStatus] = useState(false);
-    const [transactionId, setTransactionId] = useState('');
-
-    
 
     useEffect(() => {
-      fetchUserTransaction();
+        fetchUserTransaction();
     }, []);
 
     const fetchUserTransaction = async () => {
@@ -34,11 +31,10 @@ const PetGroomer = () => {
                 // Fetch unConfirm
                 if (data?.unConfirm && Array.isArray(data?.unConfirm)) {
                     const unconfirmIds = data.unConfirm;
-                    const filteredUnconfirmIds = unconfirmIds.filter(id => id.includes(uid));
+                    const filteredUnconfirmIds = unconfirmIds.filter(id => id.endsWith(uid));
 
                     if (filteredUnconfirmIds.length > 0) {
                         setConfirmStatus(true);
-                        setTransactionId(filteredUnconfirmIds[0]); // Ambil ID pertama yang cocok
                     } else {
                         setConfirmStatus(false);
                     }
@@ -49,11 +45,10 @@ const PetGroomer = () => {
                 // Fetch onProgress
                 if (data?.onProgress && Array.isArray(data?.onProgress)) {
                     const onProgressIds = data.onProgress;
-                    const filteredOnProgressIds = onProgressIds.filter(id => id.includes(uid));
+                    const filteredOnProgressIds = onProgressIds.filter(id => id.endsWith(uid));
 
                     if (filteredOnProgressIds.length > 0) {
                         setOnProgressStatus(true);
-                        // Lakukan sesuatu dengan data on progress jika diperlukan
                     } else {
                         setOnProgressStatus(false);
                     }
@@ -64,11 +59,10 @@ const PetGroomer = () => {
                 // Fetch completed
                 if (data?.completed && Array.isArray(data?.completed)) {
                     const completedIds = data.completed;
-                    const filteredCompletedIds = completedIds.filter(id => id.includes(uid));
+                    const filteredCompletedIds = completedIds.filter(id => id.endsWith(uid));
 
                     if (filteredCompletedIds.length > 0) {
                         setCompletedStatus(true);
-                        // Lakukan sesuatu dengan data completed jika diperlukan
                     } else {
                         setCompletedStatus(false);
                     }
@@ -83,36 +77,34 @@ const PetGroomer = () => {
         }
     };
 
-    // Tentukan ikon dan warnanya berdasarkan status
-    let unConfirmIcon = 'checkbox-blank-circle-outline';
-    if (confirmStatus) {
-        unConfirmIcon = 'check-circle';
-    }
-
-    let onProgressIcon = 'circle-slice-5';
-    if (!onProgressStatus) {
-        onProgressIcon = 'circle-outline';
-    }
-
-    let completedIcon = 'checkbox-blank-circle-outline';
-    if (completedStatus) {
-        completedIcon = 'check-circle';
-    }
+    const confirmIconColor = confirmStatus ? '#FA751C' : 'grey';
+    const onProgressIconColor = onProgressStatus ? '#FA751C' : 'grey';
+    const completedIconColor = completedStatus ? '#FA751C' : 'grey';
 
     return (
         <ScrollView contentContainerStyle={styles.page}>
-          <View>
-          </View>
-            <View style={styles.containerAll}>
-                <View style={{ justifyContent: 'space-between', height: '101.5%' }}>
-                    <MaterialCommunityIcon name={unConfirmIcon} size={40} color={confirmStatus ? '#FA751C' : 'grey'} style={styles.icon} />
-                    <MaterialCommunityIcon name={onProgressIcon} size={40} color={onProgressStatus ? '#FA751C' : 'grey'} style={styles.icon} />
-                    <MaterialCommunityIcon name={completedIcon} size={40} color={completedStatus ? '#FA751C' : 'grey'} style={styles.icon} />
+            <View style={styles.container}>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Service Name</Text>
+                    <Text style={styles.subtitle}>21/06/2024</Text>
                 </View>
-                <View style={{ justifyContent: 'space-between', height: '96.5%' }}>
-                    <Text style={styles.text}>Waiting for Groomer{"\n"}Confirmation</Text>
-                    <Text style={styles.text}>On Progress</Text>
-                    <Text style={styles.text}>Completed</Text>
+                <View style={styles.descContainer}>
+                    <Text style={styles.desc}>Dog</Text>
+                    <Text style={styles.desc}>st. lorem ipsum, dolor sit, amet</Text>
+                </View>
+                <View style={styles.indicatorContainer}>
+                    <View style={{ alignItems: 'center' }}>
+                        <MaterialCommunityIcon name='check-circle' size={30} color={confirmIconColor} />
+                        <Text style={styles.label}>Confirm</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <MaterialCommunityIcon name='circle-slice-5' size={30} color={onProgressIconColor} />
+                        <Text style={styles.label}>On Progress</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <MaterialCommunityIcon name='star-circle' size={30} color={completedIconColor} />
+                        <Text style={styles.label}>Complete</Text>
+                    </View>
                 </View>
             </View>
         </ScrollView>
@@ -154,20 +146,118 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center'
     },
-    containerAll: {
-        height: '40%',
-        flexDirection: 'row',
-        marginTop: 50,
-        justifyContent: 'space-between',
-        width: '60%'
+
+    container: {
+        marginVertical: 50,
+        borderWidth: 3,
+        borderColor: '#FA751C',
+        borderRadius: 30,
+        padding: 20,
+        width: '80%'
     },
-    text: {
-        color: 'black',
+    titleContainer: {
+        marginBottom: 30,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: '700',
+        color: 'black'
+    },
+    subtitle: {
         fontSize: 18,
-        fontWeight: '600',
+        fontWeight: '700',
+        color: 'black'
     },
-    icon: {
+    descContainer: {
+        marginBottom: 30,
     },
+    desc: {
+        fontSize: 16,
+        color: '#343a40',
+        fontWeight: '400'
+    },
+    label: {
+        fontWeight: '800'
+    },
+    indicatorContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    }
+
 });
 
 export default ProgressPage;
+
+// const [confirmStatus, setConfirmStatus] = useState(false);
+    // const [onProgressStatus, setOnProgressStatus] = useState(false);
+    // const [completedStatus, setCompletedStatus] = useState(false);
+    // const [transactionId, setTransactionId] = useState('');
+
+    
+
+    // useEffect(() => {
+    //   fetchUserTransaction();
+    // }, []);
+
+    // const fetchUserTransaction = async () => {
+    //     const user = auth().currentUser;
+    //     const uid = user?.uid;
+
+    //     try {
+    //         const docSnapshot = await firestore().collection('petGroomerTransaction').doc('transactionStatus').get();
+    //         if (docSnapshot.exists) {
+    //             const data = docSnapshot.data();
+
+    //             // Fetch unConfirm
+    //             if (data?.unConfirm && Array.isArray(data?.unConfirm)) {
+    //                 const unconfirmIds = data.unConfirm;
+    //                 const filteredUnconfirmIds = unconfirmIds.filter(id => id.includes(uid));
+
+    //                 if (filteredUnconfirmIds.length > 0) {
+    //                     setConfirmStatus(true);
+    //                     setTransactionId(filteredUnconfirmIds[0]); // Ambil ID pertama yang cocok
+    //                 } else {
+    //                     setConfirmStatus(false);
+    //                 }
+    //             } else {
+    //                 setConfirmStatus(false);
+    //             }
+
+    //             // Fetch onProgress
+    //             if (data?.onProgress && Array.isArray(data?.onProgress)) {
+    //                 const onProgressIds = data.onProgress;
+    //                 const filteredOnProgressIds = onProgressIds.filter(id => id.includes(uid));
+
+    //                 if (filteredOnProgressIds.length > 0) {
+    //                     setOnProgressStatus(true);
+    //                     // Lakukan sesuatu dengan data on progress jika diperlukan
+    //                 } else {
+    //                     setOnProgressStatus(false);
+    //                 }
+    //             } else {
+    //                 setOnProgressStatus(false);
+    //             }
+
+    //             // Fetch completed
+    //             if (data?.completed && Array.isArray(data?.completed)) {
+    //                 const completedIds = data.completed;
+    //                 const filteredCompletedIds = completedIds.filter(id => id.includes(uid));
+
+    //                 if (filteredCompletedIds.length > 0) {
+    //                     setCompletedStatus(true);
+    //                     // Lakukan sesuatu dengan data completed jika diperlukan
+    //                 } else {
+    //                     setCompletedStatus(false);
+    //                 }
+    //             } else {
+    //                 setCompletedStatus(false);
+    //             }
+    //         } else {
+    //             console.log('Document not found');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching data:', error);
+    //     }
+    // };
+
+    // // Tentukan ikon dan warnanya berdasarkan status

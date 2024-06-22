@@ -8,6 +8,7 @@ import LoadingPage from './loading';
 import CustomButton from '../assets/properties/CustomButton';
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
+import {firebase} from '@react-native-firebase/firestore';
 import collection from '@react-native-firebase/firestore';
 import query from '@react-native-firebase/firestore';
 import orderBy from '@react-native-firebase/firestore';
@@ -136,20 +137,6 @@ const PetGroomer = ({ navigation }: any) => {
       )
   );
 
-  const getCurrentDateTime = () => {
-    const currentDate = new Date();
-  
-    const year = currentDate.getFullYear();
-    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // +1 karena bulan dimulai dari 0
-    const day = ('0' + currentDate.getDate()).slice(-2);
-  
-    const hours = ('0' + currentDate.getHours()).slice(-2);
-    const minutes = ('0' + currentDate.getMinutes()).slice(-2);
-    const seconds = ('0' + currentDate.getSeconds()).slice(-2);
-  
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  };  
-
   const uploadTransactionData = async(Uid:string, currentDateTime: string, paymentProof:string) =>{
     await firestore().collection('petGroomerTransaction').doc(`${currentDateTime} ${Uid}`).set(
       {
@@ -165,7 +152,9 @@ const PetGroomer = ({ navigation }: any) => {
     )
     await firestore().collection('petGroomerTransaction').doc('transactionStatus').set({
       unConfirm: firestore.FieldValue.arrayUnion(`${currentDateTime} ${Uid}`)
-    }, { merge: true });  }
+    }, { merge: true });
+  }
+  // // UPDATE CURRENT DATE
   
   const handlePayment = async() => {
     if (selectedPetType.length > 0) {
@@ -177,7 +166,7 @@ const PetGroomer = ({ navigation }: any) => {
           Alert.alert("Please upload payment proof !");
           return;
         }
-        const currentDateTime = getCurrentDateTime();
+        const currentDateTime = firebase.firestore.Timestamp.now();
         const paymentProof = `payment/'${currentDateTime} ${uid}`;
         const uploadUri = imageUri;
         const storageRef = storage().ref(paymentProof);
