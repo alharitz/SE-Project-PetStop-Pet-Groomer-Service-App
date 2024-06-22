@@ -145,7 +145,6 @@ const LoginPage = ({navigation}: any) => {
           }}
           disabled={!isFieldsFilled()}
           onPress = {handleLoginButtonPress}
-          testID="Login"
         />
         <SafeAreaView style={{flexDirection:'row', marginTop: 30}} >
           <Text style={{fontSize: 16, color: 'black'}}>

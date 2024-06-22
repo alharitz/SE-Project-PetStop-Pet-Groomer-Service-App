@@ -137,8 +137,20 @@ const PetGroomer = ({ navigation }: any) => {
       )
   );
 
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
   const uploadTransactionData = async(Uid:string, currentDateTime: string, paymentProof:string) =>{
-    await firestore().collection('petGroomerTransaction').doc(`${currentDateTime} ${Uid}`).set(
+    await firestore().collection('petGroomerTransaction').doc(`${currentDateTime}_${Uid}`).set(
       {
         Uid: Uid,
         service: selectedService.title,
@@ -150,8 +162,14 @@ const PetGroomer = ({ navigation }: any) => {
         notes: notes
       }
     )
+    await firestore().collection('user').doc(Uid).update(
+      {
+        transactionId: `${currentDateTime}_${Uid}`,
+      }
+    )
+
     await firestore().collection('petGroomerTransaction').doc('transactionStatus').set({
-      unConfirm: firestore.FieldValue.arrayUnion(`${currentDateTime} ${Uid}`)
+      unConfirm: firestore.FieldValue.arrayUnion(`${currentDateTime}_${Uid}`)
     }, { merge: true });
   }
   // // UPDATE CURRENT DATE
@@ -166,8 +184,8 @@ const PetGroomer = ({ navigation }: any) => {
           Alert.alert("Please upload payment proof !");
           return;
         }
-        const currentDateTime = firebase.firestore.Timestamp.now();
-        const paymentProof = `payment/'${currentDateTime} ${uid}`;
+        const currentDateTime = getCurrentDateTime();
+        const paymentProof = `payment/'${currentDateTime}_${uid}`;
         const uploadUri = imageUri;
         const storageRef = storage().ref(paymentProof);
         const uploadTask = storageRef.putFile(uploadUri);

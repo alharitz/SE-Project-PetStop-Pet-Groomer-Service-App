@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+
 import {
   View,
   Text, 
@@ -23,6 +25,19 @@ const ProfilePage = ({ navigation }:any) => {
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [imageUri, setImageUri] = useState('');
   const defaultImage = require('./images/logoFix.png');
+
+  useFocusEffect(
+    useCallback(() => {
+        const fetchData = () => {
+            fetchUserData
+        };
+
+        fetchData();
+        const interval = setInterval(fetchData, 5000);
+
+        return () => clearInterval(interval);
+    }, [])
+);
 
   useEffect(() => {
     fetchUserData();

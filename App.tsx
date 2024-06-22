@@ -12,6 +12,7 @@ import AccountPage from './screens/account';
 import PetGroomer from './screens/petGroomer';
 import AddressPage from './screens/address';
 import ProgressPage from './screens/progress';
+import AdminDashboard from './screens/admin';
 
 const Stack = createNativeStackNavigator();
 
@@ -66,6 +67,7 @@ const App = () => {
         <Stack.Screen name='Index' component={Index} options={{ headerShown: false }} />
         <Stack.Screen name ='Account' component={AccountPage} />
         <Stack.Screen name ='Address' component={AddressPage} />
+        <Stack.Screen name= 'Admin Dashboard' component={AdminDashboard} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

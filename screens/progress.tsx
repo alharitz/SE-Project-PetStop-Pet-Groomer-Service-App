@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     View,
     ScrollView,
@@ -6,6 +6,7 @@ import {
     Text,
 } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { useFocusEffect } from '@react-navigation/native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -14,10 +15,79 @@ const PetGroomer = () => {
     const [confirmStatus, setConfirmStatus] = useState(false);
     const [onProgressStatus, setOnProgressStatus] = useState(false);
     const [completedStatus, setCompletedStatus] = useState(false);
+    const [transactionDetail, setTransactionDetail] = useState<Data[]>([]);
+
+    type Data = {
+        Uid: string;
+        address: string;
+        deliveryOption: string;
+        notes?: string;
+        petType: string;
+        service: string;
+        transactionDateTime: string;
+        transactionProof: string;
+    };
 
     useEffect(() => {
+        fetchTransactionDetail();
         fetchUserTransaction();
+        fetchTransactionIds();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            const fetchData = () => {
+                fetchTransactionDetail();
+                fetchUserTransaction();
+                fetchTransactionIds();
+            };
+
+            fetchData();
+            const interval = setInterval(fetchData, 5000);
+
+            return () => clearInterval(interval);
+        }, [])
+    );
+
+    const fetchTransactionIds = async () => {
+        const user = auth().currentUser;
+        const uid = user?.uid;
+    
+        if (!uid) return;
+    
+        try {
+            const userDoc = await firestore().collection('user').doc(uid).get();
+            if (userDoc.exists) {
+                const data = userDoc.data();
+                const transactionId = data?.transactionId;
+                return transactionId;
+            } else {
+                console.log('Document not found');
+            }
+        } catch (error) {
+            console.error('Error fetching transaction ID:', error);
+        }
+    };
+
+    const fetchTransactionDetail = async () => {
+        const user = auth().currentUser;
+        const uid = user?.uid;
+
+        if (!uid) return;
+
+        try {
+            const transactionId = await fetchTransactionIds();
+            const docSnapshot = await firestore().collection('petGroomerTransaction').doc(transactionId).get();
+            if (docSnapshot.exists) {
+                const data = docSnapshot.data() as Data;
+                setTransactionDetail([data]);
+            } else {
+                console.log('Document not found');
+            }
+        } catch (error) {
+            console.error('Error fetching transaction detail:', error);
+        }
+    };
 
     const fetchUserTransaction = async () => {
         const user = auth().currentUser;
@@ -32,12 +102,8 @@ const PetGroomer = () => {
                 if (data?.unConfirm && Array.isArray(data?.unConfirm)) {
                     const unconfirmIds = data.unConfirm;
                     const filteredUnconfirmIds = unconfirmIds.filter(id => id.endsWith(uid));
-
-                    if (filteredUnconfirmIds.length > 0) {
-                        setConfirmStatus(true);
-                    } else {
-                        setConfirmStatus(false);
-                    }
+                    
+                    setConfirmStatus(filteredUnconfirmIds.length > 0);
                 } else {
                     setConfirmStatus(false);
                 }
@@ -47,11 +113,7 @@ const PetGroomer = () => {
                     const onProgressIds = data.onProgress;
                     const filteredOnProgressIds = onProgressIds.filter(id => id.endsWith(uid));
 
-                    if (filteredOnProgressIds.length > 0) {
-                        setOnProgressStatus(true);
-                    } else {
-                        setOnProgressStatus(false);
-                    }
+                    setOnProgressStatus(filteredOnProgressIds.length > 0);
                 } else {
                     setOnProgressStatus(false);
                 }
@@ -61,11 +123,7 @@ const PetGroomer = () => {
                     const completedIds = data.completed;
                     const filteredCompletedIds = completedIds.filter(id => id.endsWith(uid));
 
-                    if (filteredCompletedIds.length > 0) {
-                        setCompletedStatus(true);
-                    } else {
-                        setCompletedStatus(false);
-                    }
+                    setCompletedStatus(filteredCompletedIds.length > 0);
                 } else {
                     setCompletedStatus(false);
                 }
@@ -83,30 +141,39 @@ const PetGroomer = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.page}>
-            <View style={styles.container}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>Service Name</Text>
-                    <Text style={styles.subtitle}>21/06/2024</Text>
-                </View>
-                <View style={styles.descContainer}>
-                    <Text style={styles.desc}>Dog</Text>
-                    <Text style={styles.desc}>st. lorem ipsum, dolor sit, amet</Text>
-                </View>
-                <View style={styles.indicatorContainer}>
-                    <View style={{ alignItems: 'center' }}>
-                        <MaterialCommunityIcon name='check-circle' size={30} color={confirmIconColor} />
-                        <Text style={styles.label}>Confirm</Text>
+            {confirmStatus ? (
+                transactionDetail.map((detail, index) => (
+                    <View key={index} style={styles.container}>
+                        <View>
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.title}>{detail.service}</Text>
+                                <Text style={styles.subtitle}>{detail.transactionDateTime}</Text>
+                            </View>
+                            <View style={styles.descContainer}>
+                                <Text style={styles.desc}>{detail.petType}</Text>
+                                <Text style={styles.desc}>{detail.address}</Text>
+                                {detail.notes && <Text style={styles.desc}>{detail.notes}</Text>}
+                            </View>
+                        </View>
+                        <View style={styles.indicatorContainer}>
+                            <View style={{ alignItems: 'center' }}>
+                                <MaterialCommunityIcon name='check-circle' size={30} color={confirmIconColor} />
+                                <Text style={styles.label}>Confirm</Text>
+                            </View>
+                            <View style={{ alignItems: 'center' }}>
+                                <MaterialCommunityIcon name='circle-slice-5' size={30} color={onProgressIconColor} />
+                                <Text style={styles.label}>On Progress</Text>
+                            </View>
+                            <View style={{ alignItems: 'center' }}>
+                                <MaterialCommunityIcon name='star-circle' size={30} color={completedIconColor} />
+                                <Text style={styles.label}>Complete</Text>
+                            </View>
+                        </View>
                     </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <MaterialCommunityIcon name='circle-slice-5' size={30} color={onProgressIconColor} />
-                        <Text style={styles.label}>On Progress</Text>
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <MaterialCommunityIcon name='star-circle' size={30} color={completedIconColor} />
-                        <Text style={styles.label}>Complete</Text>
-                    </View>
-                </View>
-            </View>
+                ))
+            ) : (
+                <Text style={styles.noData}>No transactions</Text>
+            )}
         </ScrollView>
     );
 };
@@ -146,7 +213,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center'
     },
-
     container: {
         marginVertical: 50,
         borderWidth: 3,
@@ -174,90 +240,22 @@ const styles = StyleSheet.create({
     desc: {
         fontSize: 16,
         color: '#343a40',
-        fontWeight: '400'
+        fontWeight: '400',
+        marginVertical: 10,
     },
     label: {
-        fontWeight: '800'
+        fontWeight: '800',
     },
     indicatorContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-    }
-
+    },
+    noData: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: 'grey',
+        marginTop: 50,
+    },
 });
 
 export default ProgressPage;
-
-// const [confirmStatus, setConfirmStatus] = useState(false);
-    // const [onProgressStatus, setOnProgressStatus] = useState(false);
-    // const [completedStatus, setCompletedStatus] = useState(false);
-    // const [transactionId, setTransactionId] = useState('');
-
-    
-
-    // useEffect(() => {
-    //   fetchUserTransaction();
-    // }, []);
-
-    // const fetchUserTransaction = async () => {
-    //     const user = auth().currentUser;
-    //     const uid = user?.uid;
-
-    //     try {
-    //         const docSnapshot = await firestore().collection('petGroomerTransaction').doc('transactionStatus').get();
-    //         if (docSnapshot.exists) {
-    //             const data = docSnapshot.data();
-
-    //             // Fetch unConfirm
-    //             if (data?.unConfirm && Array.isArray(data?.unConfirm)) {
-    //                 const unconfirmIds = data.unConfirm;
-    //                 const filteredUnconfirmIds = unconfirmIds.filter(id => id.includes(uid));
-
-    //                 if (filteredUnconfirmIds.length > 0) {
-    //                     setConfirmStatus(true);
-    //                     setTransactionId(filteredUnconfirmIds[0]); // Ambil ID pertama yang cocok
-    //                 } else {
-    //                     setConfirmStatus(false);
-    //                 }
-    //             } else {
-    //                 setConfirmStatus(false);
-    //             }
-
-    //             // Fetch onProgress
-    //             if (data?.onProgress && Array.isArray(data?.onProgress)) {
-    //                 const onProgressIds = data.onProgress;
-    //                 const filteredOnProgressIds = onProgressIds.filter(id => id.includes(uid));
-
-    //                 if (filteredOnProgressIds.length > 0) {
-    //                     setOnProgressStatus(true);
-    //                     // Lakukan sesuatu dengan data on progress jika diperlukan
-    //                 } else {
-    //                     setOnProgressStatus(false);
-    //                 }
-    //             } else {
-    //                 setOnProgressStatus(false);
-    //             }
-
-    //             // Fetch completed
-    //             if (data?.completed && Array.isArray(data?.completed)) {
-    //                 const completedIds = data.completed;
-    //                 const filteredCompletedIds = completedIds.filter(id => id.includes(uid));
-
-    //                 if (filteredCompletedIds.length > 0) {
-    //                     setCompletedStatus(true);
-    //                     // Lakukan sesuatu dengan data completed jika diperlukan
-    //                 } else {
-    //                     setCompletedStatus(false);
-    //                 }
-    //             } else {
-    //                 setCompletedStatus(false);
-    //             }
-    //         } else {
-    //             console.log('Document not found');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching data:', error);
-    //     }
-    // };
-
-    // // Tentukan ikon dan warnanya berdasarkan status

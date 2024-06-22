@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 // screens
 import HistoryPage from "./history";
@@ -15,6 +17,32 @@ import ProfilePage from "./profile";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const checkUserRole = async () => {
+  const user = auth().currentUser;
+  const uid = user?.uid;
+
+  if (!uid) return;
+
+  // UID admin yang dituju
+  const adminUid = 'Hq9q3kjcVzYIiC6vA09CMr3v3Sp2';
+
+  try {
+    if (uid === adminUid) {
+      return 'admin'; // Jika UID adalah UID admin, kembalikan 'admin'
+    } else {
+      const userDoc = await firestore().collection('users').doc(uid).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        return userData?.role; // Kembalikan peran pengguna jika dokumen pengguna ada
+      } else {
+        console.log('User document not found');
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching user role:', error);
+  }
+};
 
 const HomeStack = () => {
   return (
@@ -36,7 +64,22 @@ const HomeStack = () => {
   );
 };
 
-const Index = () => {
+const Index = ({navigation}:any) => {
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const role = await checkUserRole();
+      if (role === 'admin') {
+        // Redirect to admin dashboard
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Admin Dashboard' }],
+        });
+      }
+    };
+
+    fetchUserRole();
+  }, []);
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
