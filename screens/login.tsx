@@ -32,6 +32,7 @@ import LoadingPage from './loading';
 const LoginPage = ({navigation}: any) => {
 // set error message
   const [errorMessage, setErrorMessage] = useState('');
+  const [message, setMessage] = useState('');
 
   // Variables
   // Email
@@ -50,6 +51,7 @@ const LoginPage = ({navigation}: any) => {
   const handleLoginButtonPress = async() =>{
     try{
       await auth().signInWithEmailAndPassword(email, password);
+      setMessage("Login Successful");
       navigation.reset({
         index: 0,
         routes: [{ name: 'Index' }],
@@ -96,17 +98,21 @@ const LoginPage = ({navigation}: any) => {
         <Text style={styles.text}>
           Water is life. Water is a basic human need in various lines of life, humans need water
         </Text>
+        {message ? <Text testID="messageText">{message}</Text> : null}
         <TextInput
           style={styles.form}
           onChangeText={onChangeEmail}
           value={email}
-          placeholder="youremail@mail.com" />
+          placeholder="youremail@mail.com"
+          testID="emailInput"
+         />
         <SafeAreaView style={styles.password_form_container}>
           <TextInput
             style={styles.form}
             placeholder="Password"
             secureTextEntry = {!showPassword}
             onChangeText={onChangePassword}
+            testID="passwordInput"
             value={password}
           />
             <TouchableOpacity  

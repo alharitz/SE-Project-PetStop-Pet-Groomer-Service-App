@@ -20,9 +20,11 @@ const Account = ({ navigation }: any) => {
 
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  
+  const [name, setName] = useState('');
 
   const user = auth().currentUser;
-  const uid = user?.uid;
+  const uid = user?.uid;  
 
   useEffect(() => {
     if(user){
