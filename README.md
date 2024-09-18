@@ -1,7 +1,7 @@
-# PetApp - Pet Grooming Service App
+# PetStop - Pet Grooming Service App
 
 ## Overview
-**PetApp** is a mobile application built using **React Native** and **Firebase** that provides an efficient way for users to book grooming services for their pets. This app simplifies the process for pet owners by offering an easy-to-use interface to schedule appointments, track service history, and get updates on grooming status.
+**PetStop** is a mobile application built using **React Native** and **Firebase** that provides an efficient way for users to book grooming services for their pets. This app simplifies the process for pet owners by offering an easy-to-use interface to schedule appointments, track service history, and get updates on grooming status.
 
 ## Features
 - User authentication via Firebase
@@ -19,8 +19,8 @@
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/alharitz/SE-Project-PetApp-Pet-Groomer-Service-App.git
-   cd SE-Project-PetApp-Pet-Groomer-Service-App
+   git clone https://github.com/alharitz/SE-Project-PetStop-Pet-Groomer-Service-App.git
+   cd SE-Project-PetStop-Pet-Groomer-Service-App
    ```
 
 2. Install dependencies:
