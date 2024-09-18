@@ -41,6 +41,9 @@
    npm run android   # for Android
    npm run ios       # for iOS
    ```
+## Project Report
+
+Project Report [Report](PROJECT_REPORT)
 
 ## License
 
