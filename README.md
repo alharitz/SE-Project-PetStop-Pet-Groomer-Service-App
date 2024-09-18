@@ -43,7 +43,7 @@
    ```
 ## Project Report
 
-Here are the project research, UML diagram, and Report [Report](PROJECT_REPORT)
+Here are the project research, UML diagram, and Report [Report](PROJECT_REPORT.pdf)
 
 ## License
 
