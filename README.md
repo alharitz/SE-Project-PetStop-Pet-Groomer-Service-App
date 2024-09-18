@@ -1,18 +1,50 @@
-Project Aol Software Engineering "PetStop"
+# PetStop - Pet Grooming Service App
 
-CARA MAKE GIT
+## Overview
+**PetStop** is a mobile application built using **React Native** and **Firebase** that provides an efficient way for users to book grooming services for their pets. This app simplifies the process for pet owners by offering an easy-to-use interface to schedule appointments, track service history, and get updates on grooming status.
 
-klo mau ngambil repo pastiin udah di fork dlu
-klo udah baru di git clone <url>
+## Features
+- User authentication via Firebase
+- Browse and book grooming services
+- Appointment scheduling and management
+- Push notifications for appointment reminders and updates
+- Service history tracking
 
-klo dari local mau di upload ke remote pasttin di fetch dlu dari remote:
->> git checkout main
->> git pull origin main
+## Technologies
+- **React Native**: Cross-platform mobile application framework.
+- **Firebase**: Backend as a service (BaaS) for authentication, database, and cloud functions.
 
-baru lu bisa 
->> git add .
->> git commit -m "messagenya"
->> git push
+## Installation
 
+1. Clone the repository:
 
-KELOMPOK 4
+   ```bash
+   git clone https://github.com/alharitz/SE-Project-PetStop-Pet-Groomer-Service-App.git
+   cd SE-Project-PetStop-Pet-Groomer-Service-App
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Set up Firebase:
+
+   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).
+   - Set up Firebase Authentication, Firestore, and Cloud Functions as needed.
+   - Add your Firebase configuration to the app.
+
+4. Run the app:
+
+   ```bash
+   npm run android   # for Android
+   npm run ios       # for iOS
+   ```
+## Project Report
+
+Here are the project research, UML diagram, test result, and other documentations. [Project Report](PROJECT_REPORT.pdf)
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
